@@ -20,6 +20,8 @@ import type { Env, StudentRow } from "../types";
 import { parentAuth } from "../lib/auth";
 import { getCityConfig } from "../lib/city-configs";
 import { ALLOWED_MIME, MAX_ATTACHMENT_SIZE } from "../lib/validate";
+import { uniqueId } from "../lib/ids";
+import { touchUpdatedAt } from "../db/queries";
 import {
   recognizeAward,
   recognizeTalent,
@@ -425,6 +427,161 @@ function registerKind(path: string, kind: OcrKind, label: string) {
 registerKind("award", "award", "识别");
 registerKind("talent", "talent", "识别");
 registerKind("work", "work", "看图说话");
+
+/* ============================================================================
+ * v1.8: POST /api/me/ocr/ingest — 批量材料「识别 + 自动建条目」一条龙
+ *
+ * 新上传流程（家长端批量上传卡片）：
+ *   家长先选归属（获奖/特长/作品），多选文件逐个上传到 /api/me/attachments
+ *  （此时附件 item_id 为空），最后把全部 attachment_id 交给本端点。
+ *   本端点逐个识别（缓存 → 限流 → 模型，与单张端点同一套 processVision），
+ *   然后按识别字段自动创建对应板块条目，并把附件绑定到新条目
+ *  （UPDATE attachments.item_id + content.cert_images/images 引用）。
+ *
+ * 设计要点：
+ *   - 单张失败不拖垮整批：识别失败/非图片也照常建「空字段 + 文件」条目，
+ *     保住已上传材料，错误信息随 results 返回，家长手动补填即可；
+ *   - 识别字段与 OCR*Fields 契约一致，直接展开即合法 section content；
+ *   - 并发 3 路（与 /batch 一致），updated_at 只在最后统一 touch 一次。
+ * ========================================================================== */
+
+type IngestSectionType = "awards" | "talents" | "works";
+const INGEST_SECTION_OF: Record<OcrKind, IngestSectionType> = {
+  award: "awards",
+  talent: "talents",
+  work: "works",
+};
+const INGEST_REF_OF: Record<OcrKind, "cert_images" | "images"> = {
+  award: "cert_images",
+  talent: "cert_images",
+  work: "images",
+};
+
+/** 识别失败/非图片时的兜底空字段（与前端「添加条目」默认值一致） */
+function ingestEmptyFields(kind: OcrKind): Record<string, unknown> {
+  if (kind === "award") {
+    return { name: "", cup_short: "", cup_tier: "", subject: "", org: "", level: "", rank: "", date: "", description: "" };
+  }
+  if (kind === "talent") {
+    return { category: "其他", title: "", description: "", years: "" };
+  }
+  return { title: "", description: "", link: "" };
+}
+
+/** 结果面板展示的条目标题 */
+function ingestTitleOf(kind: OcrKind, content: Record<string, unknown>): string {
+  if (kind === "award") return String(content.name || "") || "获奖记录";
+  return String(content.title || "") || (kind === "talent" ? "兴趣特长" : "成长作品");
+}
+
+app.post("/ingest", async (c) => {
+  const student = c.get("student");
+  const body = await c.req
+    .json<{ kind?: string; attachment_ids?: unknown }>()
+    .catch(() => null);
+  if (!body || !OCR_KINDS.includes(body.kind as OcrKind)) {
+    return fail(c, 400, "VALIDATION", `kind 必须是 ${OCR_KINDS.join("|")}`);
+  }
+  const kind = body.kind as OcrKind;
+  const ids = Array.isArray(body.attachment_ids)
+    ? body.attachment_ids.filter((x): x is string => typeof x === "string" && !!x)
+    : [];
+  if (!ids.length) return fail(c, 400, "VALIDATION", "attachment_ids 必须是非空数组");
+  if (ids.length > 20) return fail(c, 400, "VALIDATION", "单次最多 20 个文件");
+
+  const sectionType = INGEST_SECTION_OF[kind];
+  const refField = INGEST_REF_OF[kind];
+  const cfg = getCityConfig(student.city);
+  const recognize = makeRecognizer(c, kind, cfg);
+
+  interface IngestResult {
+    ok: boolean;
+    attachment_id: string;
+    section_id?: string;
+    title?: string;
+    confidence?: string;
+    error?: string;
+  }
+  const results: IngestResult[] = [];
+
+  /** 建条目 + 绑定附件；fields 为 null 表示未识别（空字段兜底保住文件） */
+  async function createItem(
+    aid: string,
+    fields: Record<string, unknown> | null,
+    errMsg?: string
+  ): Promise<IngestResult> {
+    const content: Record<string, unknown> = { ...(fields || ingestEmptyFields(kind)) };
+    // 特长分类为空 → 「其他」：前端下拉没有空选项，留空会在下次编辑时被误存成第一个选项
+    if (kind === "talent" && !content.category) content.category = "其他";
+    content[refField] = [aid];
+    const sid = await uniqueId(c.env.DB, "sections", "s", 5);
+    const now = new Date().toISOString();
+    await c.env.DB.batch([
+      c.env.DB.prepare(
+        "INSERT INTO sections (id, student_id, type, content, sort_order, created_at, updated_at) VALUES (?,?,?,?,?,?,?)"
+      ).bind(sid, student.id, sectionType, JSON.stringify(content), 0, now, now),
+      c.env.DB.prepare(
+        "UPDATE attachments SET item_id = ?, section_type = ? WHERE id = ? AND student_id = ?"
+      ).bind(sid, sectionType, aid, student.id),
+    ]);
+    const base: IngestResult = {
+      ok: !errMsg,
+      attachment_id: aid,
+      section_id: sid,
+      title: ingestTitleOf(kind, content),
+    };
+    if (errMsg) base.error = errMsg;
+    return base;
+  }
+
+  const queue = [...ids];
+  const worker = async () => {
+    while (queue.length) {
+      const aid = queue.shift()!;
+      try {
+        const got = await fetchOwnedImage(c, aid);
+        if (!got) {
+          // 附件存在但非图片（PDF/Word）：建空条目保住文件；不存在则纯报错
+          const exists = await fetchOwnedAttachment(c, aid);
+          results.push(
+            exists
+              ? await createItem(aid, null, "非图片文件，AI 未识别")
+              : { ok: false, attachment_id: aid, error: "附件不存在" }
+          );
+          continue;
+        }
+        const r = await processVision(c, kind, got.bytes, got.mime, aid, recognize);
+        if (r instanceof Response) {
+          let msg = "AI 识别失败";
+          try {
+            const b = (await r.clone().json()) as { error?: { message?: string } };
+            if (b && b.error && b.error.message) msg = b.error.message;
+          } catch {
+            /* 忽略 */
+          }
+          results.push(await createItem(aid, null, msg));
+        } else {
+          const fields = (r as { fields?: Record<string, unknown> }).fields || null;
+          const item = await createItem(aid, fields);
+          const conf = (r as { confidence?: string }).confidence;
+          if (conf) item.confidence = conf;
+          results.push(item);
+        }
+      } catch (e) {
+        results.push({
+          ok: false,
+          attachment_id: aid,
+          error: (e as Error).message || "处理失败",
+        });
+      }
+    }
+  };
+  await Promise.all([worker(), worker(), worker()]);
+  results.sort((a, b) => ids.indexOf(a.attachment_id) - ids.indexOf(b.attachment_id));
+  await touchUpdatedAt(c.env.DB, student.id);
+  return ok(c, { results });
+});
+
 
 // ---------- DELETE /api/me/ocr/cache/:aid ----------
 // ?kind=award|talent|work 只清指定类型；不带 kind 清空该附件全部识别缓存
