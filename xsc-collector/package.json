@@ -1,0 +1,21 @@
+{
+  "name": "xsc-collector",
+  "version": "1.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:init": "wrangler d1 execute xsc-collector --file=./schema.sql",
+    "db:init:local": "wrangler d1 execute xsc-collector --local --file=./schema.sql"
+  },
+  "dependencies": {
+    "fflate": "^0.8.2",
+    "hono": "^4.6.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240909.0",
+    "typescript": "^5.6.0",
+    "wrangler": "^3.78.0"
+  }
+}

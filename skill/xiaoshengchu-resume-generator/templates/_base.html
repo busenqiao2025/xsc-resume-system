@@ -1,0 +1,394 @@
+{% set fonts_body = fonts_body | default("'Noto Sans CJK SC','PingFang SC','Microsoft YaHei',sans-serif") %}
+{% set fonts_title = fonts_title | default("'Noto Sans CJK SC','PingFang SC','Microsoft YaHei',sans-serif") %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>{{ p.name }} · 小升初简历</title>
+{% block palette %}{% endblock %}
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root { font-size: 16px; }
+  body {
+    width: 794px;
+    margin: 0;
+    background: #ffffff;
+    color: var(--ink);
+    font-family: {{ fonts_body }};
+    line-height: 1.7;
+    font-size: 14px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  img { image-orientation: from-image; }
+
+  .page { padding: 40px 44px 48px; }
+
+  /* ---------- 封面头部 ---------- */
+  .hero {
+    display: flex;
+    gap: 28px;
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 70%);
+    border-radius: 14px;
+    padding: 30px 32px;
+    color: #ffffff;
+    margin-bottom: 26px;
+  }
+  .hero-main { flex: 1; min-width: 0; }
+  .hero-name {
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-bottom: 14px;
+    font-family: {{ fonts_title }};
+  }
+  .hero-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .hero-badge {
+    background: rgba(255,255,255,.16);
+    border: 1px solid rgba(255,255,255,.35);
+    border-radius: 999px;
+    padding: 2px 12px;
+    font-size: 12.5px;
+  }
+  .hero-info { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 20px; font-size: 13.5px; }
+  .hero-info .label { opacity: .72; margin-right: 8px; }
+  .hero-photo {
+    flex-shrink: 0;
+    width: 122px;
+    height: 158px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: rgba(255,255,255,.18);
+    border: 3px solid rgba(255,255,255,.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .hero-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .hero-photo .placeholder {
+    font-size: 44px;
+    font-weight: 700;
+    color: rgba(255,255,255,.85);
+    font-family: {{ fonts_title }};
+  }
+
+  /* ---------- 联系条 ---------- */
+  .contact-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 26px;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 20px;
+    font-size: 13px;
+    margin-bottom: 30px;
+  }
+  .contact-item .label { color: var(--muted); margin-right: 6px; }
+
+  /* ---------- 章节通用 ---------- */
+  section { margin-bottom: 30px; }
+  .sec-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .sec-title .bar { width: 5px; height: 22px; background: var(--primary); border-radius: 3px; flex-shrink: 0; }
+  .sec-title .text {
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--primary-dark);
+    letter-spacing: 1px;
+    font-family: {{ fonts_title }};
+    white-space: nowrap;
+  }
+  .sec-title .rule { flex: 1; height: 1px; background: linear-gradient(90deg, var(--border), transparent); }
+
+  /* ---------- 自荐信 ---------- */
+  .essay p { text-indent: 2em; margin-bottom: 10px; text-align: justify; }
+  .essay p:last-child { margin-bottom: 0; }
+  .essay-sign {
+    text-align: right;
+    margin-top: 16px;
+    color: var(--muted);
+    font-size: 13.5px;
+  }
+
+  /* ---------- 成绩表 ---------- */
+  table.grades { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  table.grades th, table.grades td {
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    text-align: center;
+  }
+  table.grades th { background: var(--bg-soft); color: var(--primary-dark); font-weight: 700; }
+  table.grades td:first-child { font-weight: 600; }
+
+  /* ---------- 获奖块 ---------- */
+  .award-item {
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--primary);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    background: #ffffff;
+  }
+  .award-item:last-child { margin-bottom: 0; }
+  .award-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .award-name { font-size: 15px; font-weight: 700; color: var(--ink); }
+  .award-date { font-size: 12.5px; color: var(--muted); white-space: nowrap; }
+  .award-meta { display: flex; flex-wrap: wrap; gap: 6px; margin: 7px 0 4px; }
+  .award-tag {
+    font-size: 12px;
+    background: var(--bg-soft);
+    color: var(--primary-dark);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 8px;
+  }
+  .award-desc { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+  .cert-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+  .cert {
+    width: 168px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px;
+    background: #ffffff;
+  }
+  .cert img {
+    width: 100%;
+    height: 118px;
+    object-fit: cover;
+    border-radius: 3px;
+    display: block;
+  }
+  .cert .cert-cap {
+    font-size: 11.5px;
+    color: var(--muted);
+    text-align: center;
+    padding-top: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* ---------- 特长卡片 ---------- */
+  .talent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .talent-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    background: #ffffff;
+  }
+  .talent-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+  .talent-cat {
+    font-size: 11.5px;
+    color: #ffffff;
+    background: var(--primary);
+    border-radius: 4px;
+    padding: 1px 8px;
+  }
+  .talent-title { font-size: 14.5px; font-weight: 700; }
+  .talent-years { font-size: 12px; color: var(--muted); }
+  .talent-desc { font-size: 13px; color: var(--ink); }
+
+  /* ---------- 作品 ---------- */
+  .work-item { margin-bottom: 16px; }
+  .work-item:last-child { margin-bottom: 0; }
+  .work-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px; }
+  .work-no {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--primary);
+    background: var(--bg-soft);
+    border-radius: 50%;
+    width: 20px; height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .work-title { font-size: 15px; font-weight: 700; }
+  .work-desc { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .work-images { display: flex; flex-wrap: wrap; gap: 10px; }
+  .work-images img {
+    width: 200px;
+    height: 130px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    display: block;
+  }
+  .work-link { font-size: 12.5px; color: var(--primary); word-break: break-all; }
+
+  /* ---------- 页脚 ---------- */
+  .doc-footer {
+    margin-top: 36px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .doc-footer .brand { font-weight: 600; color: var(--primary); letter-spacing: 1px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  {% if p.name %}
+  <header class="hero">
+    <div class="hero-main">
+      <div class="hero-name">{{ p.name }}</div>
+      <div class="hero-badges">
+        {% if p.basic and p.basic.gender %}<span class="hero-badge">{{ p.basic.gender }}</span>{% endif %}
+        {% for t in p.talents or [] %}{% if loop.index <= 3 and t.category %}<span class="hero-badge">{{ t.category }}特长</span>{% endif %}{% endfor %}
+        {% if p.awards %}<span class="hero-badge">获奖 {{ p.awards | length }} 项</span>{% endif %}
+      </div>
+      <div class="hero-info">
+        {% if p.basic and p.basic.birth_date %}<div><span class="label">出生年月</span>{{ p.basic.birth_date }}</div>{% endif %}
+        {% if p.basic and p.basic.primary_school %}<div><span class="label">毕业小学</span>{{ p.basic.primary_school }}</div>{% endif %}
+        {% if p.basic and p.basic.hukou_district %}<div><span class="label">户籍所在地</span>{{ p.basic.hukou_district }}</div>{% endif %}
+        {% for c in (p.contacts or [])[:1] %}{% if c.phone %}<div><span class="label">家长电话</span>{{ c.phone }}</div>{% endif %}{% endfor %}
+      </div>
+    </div>
+    <div class="hero-photo">
+      {% if p.basic and p.basic.photo %}
+      <img src="{{ p.basic.photo }}" alt="学生照片">
+      {% else %}
+      <div class="placeholder">{{ p.name[:1] }}</div>
+      {% endif %}
+    </div>
+  </header>
+  {% endif %}
+
+  {% if p.contacts %}
+  <div class="contact-bar">
+    {% for c in p.contacts %}
+    <span class="contact-item"><span class="label">{{ c.relation }}{% if c.name %} · {{ c.name }}{% endif %}{% if c.title %} · {{ c.title }}{% endif %}{% if c.work_unit %} · {{ c.work_unit }}{% endif %}</span>{{ c.phone }}</span>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if essay_paragraphs %}
+  <section>
+    <div class="sec-title"><span class="bar"></span><span class="text">自荐信</span><span class="rule"></span></div>
+    <div class="essay">
+      {% for para in essay_paragraphs %}<p>{{ para }}</p>{% endfor %}
+    </div>
+    <div class="essay-sign">此致<br>敬礼</div>
+  </section>
+  {% endif %}
+
+  {% if p.grades %}
+  <section>
+    <div class="sec-title"><span class="bar"></span><span class="text">学业成绩</span><span class="rule"></span></div>
+    <table class="grades">
+      <thead>
+        <tr><th style="width:24%">学期</th><th>语文</th><th>数学</th><th>英语</th><th>总分</th><th>排名/等级</th></tr>
+      </thead>
+      <tbody>
+        {% for g in p.grades %}
+        <tr>
+          <td>{% if g.is_core %}<strong>{{ g.semester_full }}</strong>{% else %}{{ g.semester_full }}{% endif %}</td>
+          <td>{{ g.chinese or '—' }}</td>
+          <td>{{ g.math or '—' }}</td>
+          <td>{{ g.english or '—' }}</td>
+          <td>{{ g.total or '—' }}</td>
+          <td>{{ g.level_display or '—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+  {% endif %}
+
+  {% if p.awards %}
+  <section>
+    <div class="sec-title"><span class="bar"></span><span class="text">获奖与荣誉</span><span class="rule"></span></div>
+    {% for a in p.awards %}
+    <div class="award-item">
+      <div class="award-head">
+        <span class="award-name">{{ a.name }}</span>
+        {% if a.date %}<span class="award-date">{{ a.date }}</span>{% endif %}
+      </div>
+      <div class="award-meta">
+        {% if a.subject %}<span class="award-tag">{{ a.subject }}</span>{% endif %}
+        {% if a.level %}<span class="award-tag">{{ a.level }}</span>{% endif %}
+        {% if a.rank %}<span class="award-tag">{{ a.rank }}</span>{% endif %}
+        {% if a.org %}<span class="award-tag">颁发：{{ a.org }}</span>{% endif %}
+      </div>
+      {% if a.description %}<div class="award-desc">{{ a.description }}</div>{% endif %}
+      {% if a.cert_images %}
+      <div class="cert-row">
+        {% for img in a.cert_images %}
+        <div class="cert"><img src="{{ img }}" alt="证书"><div class="cert-cap">{{ a.name }}</div></div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </section>
+  {% endif %}
+
+  {% if p.talents %}
+  <section>
+    <div class="sec-title"><span class="bar"></span><span class="text">兴趣特长</span><span class="rule"></span></div>
+    <div class="talent-grid">
+      {% for t in p.talents %}
+      <div class="talent-card">
+        <div class="talent-head">
+          {% if t.category %}<span class="talent-cat">{{ t.category }}</span>{% endif %}
+          <span class="talent-title">{{ t.title }}</span>
+          {% if t.years %}<span class="talent-years">学习 {{ t.years }} 年</span>{% endif %}
+        </div>
+        {% if t.description %}<div class="talent-desc">{{ t.description }}</div>{% endif %}
+        {% if t.cert_images %}
+        <div class="cert-row" style="margin-top:8px">
+          {% for img in t.cert_images %}
+          <div class="cert"><img src="{{ img }}" alt="证书"><div class="cert-cap">{{ t.title }}</div></div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {% if p.works %}
+  <section>
+    <div class="sec-title"><span class="bar"></span><span class="text">成长作品</span><span class="rule"></span></div>
+    {% for w in p.works %}
+    <div class="work-item">
+      <div class="work-head">
+        <span class="work-no">{{ loop.index }}</span>
+        <span class="work-title">{{ w.title }}</span>
+      </div>
+      {% if w.description %}<div class="work-desc">{{ w.description }}</div>{% endif %}
+      {% if w.images %}
+      <div class="work-images">
+        {% for img in w.images %}<img src="{{ img }}" alt="{{ w.title }}">{% endfor %}
+      </div>
+      {% endif %}
+      {% if w.link %}<div class="work-link">作品链接：{{ w.link }}</div>{% endif %}
+    </div>
+    {% endfor %}
+  </section>
+  {% endif %}
+
+  {# 目标学校与家长寄语属内部数据（给工作人员参考/写作用），绝不渲染到简历 #}
+
+  <footer class="doc-footer">
+    <span class="brand">SPARKMINDS</span>
+    <span>{{ p.name }} · 小升初简历</span>
+    <span>材料版本 v{{ p.meta.material_version if p.meta else 1 }}</span>
+  </footer>
+
+</div>
+</body>
+</html>

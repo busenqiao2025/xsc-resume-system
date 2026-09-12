@@ -1,0 +1,39 @@
+name = "xsc-collector"
+main = "src/index.ts"
+compatibility_date = "2026-09-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "xsc-collector"
+database_id = "c484579c-7327-4426-8d9d-8f385df87625"
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "xsc-materials"
+
+# v1.4: Workers AI 默认绑定（OCR 默认走这里）
+[ai]
+binding = "AI"
+
+# v1.4.2: 视觉模型尝试顺序（逗号分隔，去掉 @cf/ 前缀也能识别，建议写全名）。
+# 默认：moondream（官方唯一点名 OCR）→ qwen3.8（中文最强）→ gemma-4-26b（最省）→ llama-3.2-vision（兜底）
+# 部署后用 GET /api/me/ocr/health 实测，把真正可用的排前面再填这里。
+# 留空则用代码内置顺序。注意：kimi-k2.6 / glm-5.3-flash 等需付费账单，免费档调不通。
+[vars]
+OCR_MODEL_ORDER = "@cf/moondream/moondream3.1-9B-A2B,@cf/qwen/qwen3.8-27b,@cf/google/gemma-4-26b-a4b-it,@cf/meta/llama-3.2-11b-vision-instruct"
+
+[assets]
+directory = "./web/dist"
+binding = "ASSETS"
+run_worker_first = true        # 所有请求先走 Worker 路由，/s/:token 等动态路径由 Hono 显式分发
+html_handling = "none"         # 关掉默认的 auto-trailing-slash（会把 /s/:token 307 到 /s/）
+not_found_handling = "none"    # 未命中资源交回 Worker，由 catch-all 兜底
+
+# 部署前执行：
+#   wrangler secret put ADMIN_KEY    # openssl rand -hex 32
+#   wrangler secret put AI_API_KEY   # openssl rand -hex 32
+#
+# v1.4: 可选外部 OCR 提供方（不配则默认走 Workers AI）
+#   wrangler secret put EXTERNAL_OCR_PROVIDER   # 'openai'|'google'|'qwen'
+#   wrangler secret put EXTERNAL_OCR_API_KEY
+#   wrangler secret put EXTERNAL_OCR_MODEL      # 'gpt-4o'|'gemini-2.5-pro'|'qwen-vl-max'

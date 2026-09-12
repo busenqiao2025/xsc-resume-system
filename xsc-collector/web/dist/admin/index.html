@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="Dd8d7lsPb904zoHYq85IDI">
+<head data-page-node-id="s2PueE6jcxUwsQxFvrthQf">
+<meta charset="UTF-8" data-page-node-id="O94B2oPJcQ659IKERq5MqR">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" data-page-node-id="zfwwwmaGaq9u1C7tlYhrxE">
+<title>小升初简历系统 · 管理端</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+<style>
+:root{--blue:#2563eb;--bg:#f3f5f9;--card:#fff;--line:#e5e7eb;--text:#1f2937;--muted:#6b7280;--red:#dc2626;--green:#16a34a}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+input,select{font-family:inherit;font-size:15px;padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:#fff}
+button{font-family:inherit;cursor:pointer}
+.wrap{max-width:1200px;margin:0 auto;padding:24px 16px 80px}
+h1{font-size:20px;margin-bottom:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px}
+.btn{display:inline-flex;align-items:center;min-height:38px;padding:6px 14px;border-radius:8px;border:1px solid var(--line);background:#fff;font-size:13px;color:var(--text)}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.danger{color:var(--red);border-color:#fecaca}
+.btn.sm{min-height:30px;padding:3px 10px;font-size:12px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:9px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+th{color:var(--muted);font-weight:600;white-space:nowrap}
+.table-scroll{overflow-x:auto}
+.badge{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.badge.collecting{background:#e5e7eb;color:#4b5563}
+.badge.submitted{background:#dbeafe;color:#1d4ed8}
+.badge.exported{background:#ffedd5;color:#c2410c}
+.badge.ready{background:#dcfce7;color:#15803d}
+.badge.review{background:#ede9fe;color:#6d28d9}
+.badge.regen{background:#fee2e2;color:#b91c1c}
+.badge.pending{background:#ffedd5;color:#c2410c}
+.review-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px;flex-wrap:wrap}
+.review-row .fn{flex:1;min-width:160px;word-break:break-all}
+.review-tag{padding:1px 8px;border-radius:999px;font-size:11px;font-weight:600}
+.review-tag.pending{background:#ffedd5;color:#c2410c}
+.review-tag.approved{background:#dcfce7;color:#15803d}
+.review-tag.rejected{background:#fee2e2;color:#b91c1c}
+.ops{display:flex;gap:6px;flex-wrap:wrap}
+.login-box{max-width:380px;margin:120px auto 0}
+.login-box input{width:100%;margin:10px 0}
+.login-box .btn{width:100%;justify-content:center}
+.form-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
+.modal{background:#fff;border-radius:14px;padding:22px;max-width:440px;width:100%;max-height:90vh;overflow:auto}
+.modal h3{font-size:16px;margin-bottom:10px}
+.link-box{word-break:break-all;background:#f3f4f6;border-radius:8px;padding:10px;font-size:13px;margin:10px 0}
+#qrcode{display:flex;justify-content:center;margin:12px 0}
+.muted{color:var(--muted);font-size:12px}
+.detail-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;font-size:13px;margin-top:10px}
+.detail-grid .k{color:var(--muted)}
+pre.detail-json{background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:12px;font-size:12px;overflow:auto;max-height:50vh}
+</style>
+</head>
+<body data-page-node-id="POFVebBspq08CMMhp2RXpn">
+<div id="login" class="login-box card" style="display:none" data-page-node-id="bgGSI8KKRlJUOcTWAptL0h">
+  <h1 style="font-size:17px" data-page-node-id="FFdqCFsqrS0jGTjJ2rvgzB">管理端登录</h1>
+  <p class="muted" data-page-node-id="JFvsCKNGoKgcw283eKHHCS">请输入 ADMIN_KEY（部署时 wrangler secret 设置）</p>
+  <input type="password" id="key-input" placeholder="ADMIN_KEY" data-page-node-id="lNBv5RTSJ0f06hZ0fjo5Ny">
+  <button class="btn primary" id="login-btn" data-page-node-id="lCV81ZDSwTPfdwnviwiSDs">进入</button>
+  <p class="muted" id="login-err" style="color:var(--red);margin-top:8px" data-page-node-id="nczgiLqBC2L9Eyc6KMOFF9"></p>
+</div>
+
+<div id="app" class="wrap" style="display:none" data-page-node-id="1A9I5WOaDeot8pcRqDfTGs">
+  <h1 data-page-node-id="YKijqhmuO4NcO8lMv0fNbD">小升初简历材料收集 · 管理端</h1>
+
+  <div class="card" data-page-node-id="Sx6WM3Zn1gYBjauVylaa9I">
+    <div class="form-row" data-page-node-id="ZjvSo2ux6wlSWdFWbZID5x">
+      <input id="new-name" placeholder="学生姓名" style="flex:1;min-width:140px" data-page-node-id="gjdxasAwwFru1mrGs4oU5z">
+      <select id="new-city" data-page-node-id="kCQI8cRf8mDIELpz5ABFxo"></select>
+      <select id="new-template" data-page-node-id="2T7GTmGSaHKmDCr2k7ZwG8">
+        <option value="classic-blue" data-page-node-id="Lzfe8I9tYFnehtCvOzYRVs">模板：经典蓝</option>
+        <option value="warm-elegant" data-page-node-id="3wKCRoWfwFNKjujI71hzQF">模板：暖雅</option>
+      </select>
+      <button class="btn primary" id="create-btn" data-page-node-id="9gGCFsDDuzXNpFVmBpsKzl">+ 新建学生</button>
+      <button class="btn" id="refresh-btn" data-page-node-id="MRD4wtWfwjAHa31xtGiiJ8">刷新</button>
+      <button class="btn" id="logout-btn" style="margin-left:auto" data-page-node-id="GmSHvIL0vY2tqtlxHCaOlp">退出登录</button>
+    </div>
+    <p class="muted" style="margin-top:8px" data-page-node-id="tJwEbsfaLfwLO2amYZdnso">城市决定成绩口径与竞赛字典，<b data-page-node-id="5jaBVXehjkF8qnvNgZig29">创建后不可修改</b>。</p>
+  </div>
+
+  <div class="card table-scroll" data-page-node-id="61fBWV9W921Lc6lfORbp3k">
+    <table data-page-node-id="G3iGKWi6mob1gsq1XFTge9">
+      <thead data-page-node-id="cxUe7cQC4GPE8QDFWl0X4t"><tr data-page-node-id="PrY6WqvGHAAZsRDcmFmkX2">
+        <th data-page-node-id="ZF0zB5rECN27RQwx3ClDCl">ID</th><th data-page-node-id="YNrukMkAgF9Cfxf6Vkvv6r">姓名</th><th data-page-node-id="9UEvTaPvd9DMBis8l8oA3Y">城市</th><th data-page-node-id="Omz2FEpz6xVQM9Fgm6KHwn">状态</th><th data-page-node-id="NkYHUZlW6Kb1daQOn1NB9D">材料版本</th><th data-page-node-id="EL31MfE4QVx98aDjdkSs6B">最新简历</th><th data-page-node-id="NVBRqMRo8fFDZV61kNAsH8">更新时间</th><th data-page-node-id="34AgESeGivi9yO0goOJiXM">操作</th>
+      </tr></thead>
+      <tbody id="tbody" data-page-node-id="dGBjmvTAncyVNaCkaSgAEX"><tr data-page-node-id="SUmQWE3IGvx4J9Kru7gd3b"><td colspan="8" class="muted" data-page-node-id="NognPZFSBRp3BjD92w4HcI">加载中…</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="modal-mask" id="modal-mask" data-page-node-id="J8kKsqXaDJNAOFv89JUgjn">
+  <div class="modal" id="modal-box" data-page-node-id="E1oWEHHsRYVGUddFTFp38p"></div>
+</div>
+
+<script>
+"use strict";
+let KEY = localStorage.getItem("xsc-admin-key") || "";
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => Array.from(document.querySelectorAll(s));
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+async function api(path, opts = {}) {
+  opts.headers = Object.assign({ "X-Admin-Key": KEY }, opts.headers || {});
+  if (opts.json !== undefined) {
+    opts.method = opts.method || "POST";
+    opts.headers["Content-Type"] = "application/json";
+    opts.body = JSON.stringify(opts.json);
+    delete opts.json;
+  }
+  const res = await fetch(path, opts);
+  const data = await res.json().catch(() => null);
+  if (res.status === 401) { logout(); throw new Error("ADMIN_KEY 不正确"); }
+  if (!data || data.ok === false) throw new Error((data && data.error && data.error.message) || ("请求失败 " + res.status));
+  return data.data;
+}
+
+function logout() {
+  localStorage.removeItem("xsc-admin-key");
+  KEY = "";
+  $("#app").style.display = "none";
+  $("#login").style.display = "block";
+}
+
+const STATUS_TEXT = { collecting: "填写中", submitted: "待生成", exported: "生成中", review: "待审核", ready: "已生成" };
+
+async function loadCities() {
+  const res = await fetch("/api/cities");
+  const d = await res.json();
+  const cities = (d && d.data) || [];
+  $("#new-city").innerHTML = cities.map((c) =>
+    '<option value="' + esc(c.code) + '">' + esc(c.name) + "（" + (c.schooling === "5-4" ? "五四学制" : "六三学制") + "）</option>").join("");
+}
+
+async function loadStudents() {
+  const list = await api("/api/admin/students");
+  const tb = $("#tbody");
+  if (!list.length) {
+    tb.innerHTML = '<tr><td colspan="8" class="muted">还没有学生，点击「新建学生」开始。</td></tr>';
+    return;
+  }
+  tb.innerHTML = list.map((s) => {
+    const badge = s.needs_regen
+      ? '<span class="badge regen">待重新生成</span>'
+      : '<span class="badge ' + s.status + '">' + (STATUS_TEXT[s.status] || s.status) + "</span>";
+    const dirty = s.unsubmitted_changes ? ' <span class="badge pending" title="家长改了材料但还没再点提交">有未提交修改</span>' : "";
+    return "<tr><td>" + esc(s.id) + "</td><td><b>" + esc(s.name) + "</b></td><td>" + esc(s.city_name) + "</td><td>" + badge + dirty + "</td>" +
+      "<td>v" + s.material_version + "</td>" +
+      "<td>" + (s.latest_resume_name ? esc(s.latest_resume_name) : '<span class="muted">—</span>') + "</td>" +
+      "<td>" + new Date(s.updated_at).toLocaleString("zh-CN", { hour12: false }) + "</td>" +
+      '<td><div class="ops">' +
+      (s.pending_review_count > 0 ? '<button class="btn primary" data-review="' + s.id + '">审核(' + s.pending_review_count + ')</button>' : "") +
+      '<button class="btn" data-copy="' + esc(s.invite_url) + '">复制链接</button>' +
+      '<button class="btn" data-qr="' + esc(s.invite_url) + '" data-name="' + esc(s.name) + '">二维码</button>' +
+      '<button class="btn" data-detail="' + s.id + '">详情</button>' +
+      (s.latest_resume_id ? '<button class="btn" data-pdf="' + s.id + "|" + s.latest_resume_id + '">看简历</button>' : "") +
+      '<button class="btn" data-reset="' + s.id + '">重置链接</button>' +
+      '<button class="btn danger" data-del="' + s.id + '" data-name="' + esc(s.name) + '">删除</button>' +
+      "</div></td></tr>";
+  }).join("");
+  bindRowOps();
+}
+
+function bindRowOps() {
+  $$("[data-review]").forEach((b) => b.onclick = () => showDetail(b.dataset.review));
+  $$("[data-copy]").forEach((b) => b.onclick = async () => {
+    await navigator.clipboard.writeText(b.dataset.copy).catch(() => {});
+    b.textContent = "已复制";
+    setTimeout(() => (b.textContent = "复制链接"), 1500);
+  });
+  $$("[data-qr]").forEach((b) => b.onclick = () => showInviteModal(b.dataset.name, b.dataset.qr));
+  $$("[data-detail]").forEach((b) => b.onclick = () => showDetail(b.dataset.detail));
+  $$("[data-pdf]").forEach((b) => b.onclick = () => openPdf(...b.dataset.pdf.split("|")));
+  $$("[data-reset]").forEach((b) => b.onclick = async () => {
+    if (!confirm("重置后旧邀请链接立即失效，确定？")) return;
+    const d = await api("/api/admin/students/" + b.dataset.reset, { method: "PATCH", json: { reset_token: true } });
+    showInviteModal("新邀请链接", d.invite_url);
+    loadStudents();
+  });
+  $$("[data-del]").forEach((b) => b.onclick = async () => {
+    if (!confirm("⚠️ 将删除「" + b.dataset.name + "」的全部材料、附件与简历，不可恢复。确定？")) return;
+    await api("/api/admin/students/" + b.dataset.del, { method: "DELETE" });
+    loadStudents();
+  });
+}
+
+function showModal(html) {
+  $("#modal-box").innerHTML = html + '<div style="text-align:right;margin-top:14px"><button class="btn" onclick="document.querySelector(\'#modal-mask\').style.display=\'none\'">关闭</button></div>';
+  $("#modal-mask").style.display = "flex";
+}
+$("#modal-mask").addEventListener("click", (e) => { if (e.target.id === "modal-mask") e.target.style.display = "none"; });
+
+function showInviteModal(name, url) {
+  showModal("<h3>" + esc(name) + " · 邀请链接</h3>" +
+    '<div id="qrcode"></div>' +
+    '<div class="link-box">' + esc(url) + "</div>" +
+    '<button class="btn primary" id="modal-copy">复制链接发给家长</button>');
+  $("#modal-copy").onclick = async (e) => {
+    await navigator.clipboard.writeText(url).catch(() => {});
+    e.target.textContent = "已复制";
+  };
+  if (window.QRCode) {
+    new QRCode(document.getElementById("qrcode"), { text: url, width: 180, height: 180 });
+  } else {
+    document.getElementById("qrcode").innerHTML = '<span class="muted">二维码库加载失败，请直接复制链接</span>';
+  }
+}
+
+async function showDetail(id) {
+  const d = await api("/api/admin/students/" + id);
+  const s = d.student;
+  const cnt = (arr) => (arr || []).length;
+  const RTAG = { pending: ["待审核", "pending"], approved: ["已通过", "approved"], rejected: ["已驳回", "rejected"] };
+  let resumeRows = "";
+  (d.resumes || []).forEach((r) => {
+    const tag = RTAG[r.review_status] || [r.review_status, "pending"];
+    resumeRows += '<div class="review-row"><span class="fn">' + esc(r.file_name) +
+      (r.note ? ' <span class="muted">(' + esc(r.note) + ")</span>" : "") + "</span>" +
+      '<span class="review-tag ' + tag[1] + '">' + tag[0] + "</span>" +
+      '<button class="btn sm" data-rv-view="' + r.id + '">查看</button>' +
+      (r.review_status !== "approved" ? '<button class="btn sm primary" data-rv-ok="' + r.id + '">通过</button>' : "") +
+      (r.review_status !== "rejected" ? '<button class="btn sm danger" data-rv-revise="' + r.id + '">退回修改</button>' : "") +
+      "</div>";
+    if (r.revision_note) {
+      const filesHtml = (r.revision_files || []).map((f) =>
+        '<button class="btn sm" data-rvf="' + f.id + '">' + esc(f.name) + "</button>").join(" ");
+      resumeRows += '<div class="review-row" style="border-bottom:1px solid var(--line)"><span class="fn" style="color:var(--red)">修改意见：' +
+        esc(r.revision_note) + "</span>" + filesHtml + "</div>";
+    }
+  });
+  if (!resumeRows) resumeRows = '<p class="muted">还没有生成过简历。</p>';
+
+  showModal("<h3>" + esc(s.name) + "（" + esc(s.id) + " · " + esc(s.city_config.name) + "）</h3>" +
+    '<div class="detail-grid">' +
+    "<div><span class='k'>状态：</span>" + (STATUS_TEXT[s.status] || s.status) + (s.needs_regen ? "（待重新生成）" : "") + "</div>" +
+    "<div><span class='k'>材料版本：</span>v" + s.material_version + "</div>" +
+    "<div><span class='k'>模板：</span>" + esc(s.template_id) + "</div>" +
+    "<div><span class='k'>家庭成员：</span>" + cnt(d.contacts) + " 位</div>" +
+    "<div><span class='k'>成绩：</span>" + cnt(d.sections.grades) + " 条</div>" +
+    "<div><span class='k'>获奖：</span>" + cnt(d.sections.awards) + " 条</div>" +
+    "<div><span class='k'>特长：</span>" + cnt(d.sections.talents) + " 条</div>" +
+    "<div><span class='k'>作品：</span>" + cnt(d.sections.works) + " 条</div>" +
+    "<div><span class='k'>目标学校：</span>" + cnt(d.sections.target_schools) + " 所</div>" +
+    "</div>" +
+    "<h3 style='margin-top:14px'>简历版本与审核</h3>" + resumeRows +
+    '<p class="muted" style="margin-top:6px">通过后家长端立即可见；退回修改需填写修改意见（可附佐证文件），学生自动回到待生成队列，AI 会结合意见在原有简历基础上重新生成。</p>' +
+    '<div class="link-box">' + esc(d.invite_url) + "</div>" +
+    '<details><summary class="muted" style="cursor:pointer">查看全部材料 JSON</summary><pre class="detail-json">' +
+    esc(JSON.stringify(d, null, 2)) + "</pre></details>");
+
+  $$("#modal-box [data-rv-view]").forEach((b) => b.onclick = () => openPdf(id, b.dataset.rvView));
+  $$("#modal-box [data-rvf]").forEach((b) => b.onclick = async () => {
+    const res = await fetch("/api/admin/students/" + id + "/revision-files/" + b.dataset.rvf, { headers: { "X-Admin-Key": KEY } });
+    if (!res.ok) return alert("文件读取失败");
+    const blob = await res.blob();
+    window.open(URL.createObjectURL(blob), "_blank");
+  });
+  $$("#modal-box [data-rv-ok]").forEach((b) => b.onclick = async () => {
+    if (!confirm("审核通过后家长立即可见这份简历，确认通过？")) return;
+    await api("/api/admin/students/" + id + "/resumes/" + b.dataset.rvOk + "/approve", { method: "POST", json: {} });
+    showDetail(id); loadStudents();
+  });
+  $$("#modal-box [data-rv-revise]").forEach((b) => b.onclick = () => showReviseModal(id, b.dataset.rvRevise));
+}
+
+/* ---------- 图片预压缩（v1.7，与家长端同一套标准） ----------
+   退回修改的佐证图也进 R2 和导出 zip，手机拍照直出常 3–10MB，上传前统一压缩：
+   长边 2560px + JPEG 重编码；<1MB 小图、PDF 不动；压缩后更大或环境不支持则保留原图。 */
+function decodeImageViaImg(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => { URL.revokeObjectURL(url); resolve({ width: img.naturalWidth, height: img.naturalHeight, draw: (ctx, w, h) => ctx.drawImage(img, 0, 0, w, h) }); };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("图片解码失败")); };
+    img.src = url;
+  });
+}
+function decodeImage(file) {
+  if (typeof createImageBitmap === "function") {
+    return createImageBitmap(file, { imageOrientation: "from-image" })
+      .then((bmp) => ({ width: bmp.width, height: bmp.height, draw: (ctx, w, h) => { ctx.drawImage(bmp, 0, 0, w, h); if (bmp.close) bmp.close(); } }))
+      .catch(() => decodeImageViaImg(file));
+  }
+  return decodeImageViaImg(file);
+}
+async function maybeCompressImage(file, opt) {
+  try {
+    if (!file || !(file.type || "").startsWith("image/")) return file;
+    if (file.size < 1024 * 1024) return file;
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext && canvas.getContext("2d");
+    if (!ctx) return file;
+    const src = await decodeImage(file);
+    const scale = Math.min(1, opt.maxEdge / Math.max(src.width, src.height));
+    if (scale >= 1 && file.size < 2 * 1024 * 1024) return file;
+    const w = Math.max(1, Math.round(src.width * scale));
+    const h = Math.max(1, Math.round(src.height * scale));
+    canvas.width = w; canvas.height = h;
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0, 0, w, h);
+    src.draw(ctx, w, h);
+    let blob = null;
+    for (const q of [opt.quality, 0.72, 0.6]) {
+      blob = await new Promise((res) => canvas.toBlob(res, "image/jpeg", q));
+      if (!blob) return file;
+      if (blob.size <= 3 * 1024 * 1024) break;
+    }
+    if (blob.size >= file.size) return file;
+    const name = (file.name || "image").replace(/\.[a-zA-Z0-9]{1,8}$/, "") + ".jpg";
+    return new File([blob], name, { type: "image/jpeg", lastModified: Date.now() });
+  } catch (e) {
+    console.warn("[compress] 压缩失败，改传原图:", e);
+    return file;
+  }
+}
+
+/* 退回修改：修改意见（必填）+ 佐证文件（可选，多选） */
+function showReviseModal(sid, rid) {
+  showModal("<h3>退回修改</h3>" +
+    '<p class="muted">写明这份简历哪里不满意、希望怎么改（必填）。可附佐证文件（图片/PDF，最多 5 个，单个 ≤10MB），AI 重新生成时会一并参考。</p>' +
+    '<textarea id="revise-note" rows="5" style="width:100%;font-family:inherit;font-size:14px;padding:9px 12px;border:1px solid var(--line);border-radius:8px;margin:10px 0" placeholder="例：自荐信太泛，没突出孩子的科创特点；获奖顺序请把华杯放最前；照片模糊请换一张…"></textarea>' +
+    '<input type="file" id="revise-files" multiple accept="image/*,application/pdf" style="font-size:13px">' +
+    '<div style="margin-top:14px;text-align:right"><button class="btn danger" id="revise-submit">确认退回，重新生成</button></div>');
+  $("#revise-submit").onclick = async (e) => {
+    const note = $("#revise-note").value.trim();
+    if (!note) return alert("请填写修改意见");
+    const fd = new FormData();
+    fd.append("note", note);
+    // v1.7: 佐证图片上传前压缩（PDF 原样）
+    for (const f of Array.from($("#revise-files").files || [])) {
+      fd.append("files", await maybeCompressImage(f, { maxEdge: 2560, quality: 0.82 }));
+    }
+    e.target.disabled = true;
+    e.target.textContent = "提交中…";
+    try {
+      await api("/api/admin/students/" + sid + "/resumes/" + rid + "/revise", { method: "POST", body: fd });
+      $("#modal-mask").style.display = "none";
+      loadStudents();
+    } catch (err) {
+      alert(err.message);
+      e.target.disabled = false;
+      e.target.textContent = "确认退回，重新生成";
+    }
+  };
+}
+
+async function openPdf(sid, rid) {
+  const res = await fetch("/api/admin/students/" + sid + "/resumes/" + rid, { headers: { "X-Admin-Key": KEY } });
+  if (!res.ok) return alert("简历读取失败");
+  const blob = await res.blob();
+  window.open(URL.createObjectURL(blob), "_blank");
+}
+
+/* 初始化 */
+$("#login-btn").onclick = async () => {
+  KEY = $("#key-input").value.trim();
+  if (!KEY) return;
+  try {
+    await api("/api/admin/students");
+    localStorage.setItem("xsc-admin-key", KEY);
+    $("#login").style.display = "none";
+    $("#app").style.display = "block";
+    loadStudents();
+  } catch (e) { $("#login-err").textContent = e.message; }
+};
+$("#key-input").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#login-btn").click(); });
+$("#logout-btn").onclick = logout;
+$("#refresh-btn").onclick = loadStudents;
+$("#create-btn").onclick = async () => {
+  const name = $("#new-name").value.trim();
+  if (!name) return alert("请填写学生姓名");
+  const d = await api("/api/admin/students", { json: { name, city: $("#new-city").value, template_id: $("#new-template").value } });
+  $("#new-name").value = "";
+  showInviteModal(d.name, d.invite_url);
+  loadStudents();
+};
+
+loadCities();
+if (KEY) {
+  api("/api/admin/students").then(() => {
+    $("#app").style.display = "block";
+    loadStudents();
+  }).catch(() => { $("#login").style.display = "block"; });
+} else {
+  $("#login").style.display = "block";
+}
+</script>
+</body>
+</html>

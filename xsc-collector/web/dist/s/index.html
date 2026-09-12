@@ -1,0 +1,1593 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="DTy0Ydy9BxBlNQj3TzdoC6">
+<head data-page-node-id="k6OYuVV1pEFJJIIHxv9cgL">
+<meta charset="UTF-8" data-page-node-id="3dTh8ue7RsEUkNeaZRwRcr">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" data-page-node-id="Xn9X6RQLC9N1C1Kh3W7WBN">
+<title>小升初简历材料收集</title>
+<style>
+:root{
+  --blue:#2563eb; --blue-d:#1e40af; --bg:#f3f5f9; --card:#fff; --line:#e5e7eb;
+  --text:#1f2937; --muted:#6b7280; --red:#dc2626; --green:#16a34a; --orange:#d97706;
+  --radius:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-text-size-adjust:100%}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit;font-size:16px;width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--text)}
+input:focus,select:focus,textarea:focus{outline:2px solid rgba(37,99,235,.35);border-color:var(--blue)}
+textarea{min-height:88px;resize:vertical}
+label{display:block;font-size:13px;color:var(--muted);margin:12px 0 4px}
+.layout{max-width:1080px;margin:0 auto;padding:0 14px 90px}
+/* 头部 */
+header.top{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);padding:12px 14px}
+.top-inner{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.top-inner h1{font-size:18px}
+.ver{font-size:12px;color:var(--muted)}
+.save-hint{font-size:12px;margin-left:auto;color:var(--muted)}
+.save-hint.saving{color:var(--blue)}
+.save-hint.err{color:var(--red)}
+.badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600}
+.badge.collecting{background:#e5e7eb;color:#4b5563}
+.badge.submitted{background:#dbeafe;color:#1d4ed8}
+.badge.exported{background:#ffedd5;color:#c2410c}
+.badge.ready{background:#dcfce7;color:#15803d}
+/* 横幅 */
+.banner{border-radius:10px;padding:10px 14px;margin:14px 0 0;font-size:14px}
+.banner.red{background:#fef2f2;color:var(--red);border:1px solid #fecaca}
+.banner.yellow{background:#fffbeb;color:#92400e;border:1px solid #fde68a}
+/* 主栏 + 侧栏 */
+.main{max-width:720px}
+@media(min-width:1024px){
+  .cols{display:flex;gap:24px;align-items:flex-start}
+  .side{position:sticky;top:76px;width:280px;flex:none}
+}
+@media(max-width:1023.9px){.side{margin-top:14px}}
+/* 卡片 */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-top:16px}
+.card>h2{font-size:16px;display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.card>h2 .n{display:inline-flex;width:22px;height:22px;border-radius:50%;background:var(--blue);color:#fff;font-size:12px;align-items:center;justify-content:center;flex:none}
+.card .desc{font-size:13px;color:var(--muted);margin-bottom:6px}
+.entry{border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:12px;background:#fafafa}
+.entry-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:2px}
+.entry-head .t{font-weight:600;font-size:14px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:8px 16px;border-radius:8px;border:1px solid var(--line);background:#fff;font-size:14px;color:var(--text)}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.primary:hover{background:var(--blue-d)}
+.btn.danger{color:var(--red);border-color:#fecaca}
+.btn.sm{min-height:36px;padding:4px 12px;font-size:13px}
+.btn.block{width:100%}
+.btn.add{margin-top:12px;border-style:dashed;color:var(--blue)}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 12px}
+@media(max-width:560px){.row2,.row3{grid-template-columns:1fr}}
+/* 头像 */
+.photo-wrap{display:flex;align-items:center;gap:16px;margin-top:10px}
+.photo-circle{width:96px;height:96px;border-radius:50%;object-fit:cover;border:2px solid var(--line);background:#e5e7eb;flex:none}
+/* 附件九宫格 */
+.thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+@media(min-width:560px){.thumbs{grid-template-columns:repeat(4,1fr)}}
+.thumb{position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;border:1px solid var(--line);background:#e5e7eb}
+/* v1.6: contain 而非 cover —— 缩略图完整显示整张证书，方便一眼认出上传的是什么 */
+.thumb img{width:100%;height:100%;object-fit:contain;display:block;background:#f8fafc}
+.thumb[data-att]{cursor:zoom-in}
+.thumb .zoom-hint{position:absolute;left:4px;bottom:4px;background:rgba(15,23,42,.66);color:#fff;font-size:11px;line-height:1;padding:4px 7px;border-radius:99px;pointer-events:none;white-space:nowrap}
+.thumb .file-tag{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--muted);padding:6px;text-align:center;word-break:break-all}
+.thumb .del{position:absolute;top:4px;right:4px;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;border:none;font-size:14px;line-height:1}
+.thumb .prog{position:absolute;left:0;bottom:0;height:4px;background:var(--blue);width:0%}
+.star{color:#f59e0b;font-size:12px;font-weight:700}
+.tier{display:inline-block;padding:1px 8px;border-radius:6px;font-size:12px;font-weight:700;margin-left:6px}
+.tier.T1{background:#fef3c7;color:#b45309}
+.tier.T2{background:#e0e7ff;color:#4338ca}
+.tier.T3{background:#f3f4f6;color:#4b5563}
+.tier.T4{background:#f3f4f6;color:#9ca3af}
+details.jargon{margin-top:10px;font-size:13px;color:var(--muted)}
+details.jargon summary{cursor:pointer;color:var(--blue)}
+details.jargon table{width:100%;border-collapse:collapse;margin-top:6px}
+details.jargon td{border-top:1px solid var(--line);padding:5px 4px;vertical-align:top}
+details.jargon td:first-child{white-space:nowrap;font-weight:600;color:var(--text);width:38%}
+/* 提交区 */
+.submit-zone{margin-top:20px}
+/* 简历 */
+.resume-item{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:10px;flex-wrap:wrap}
+.resume-item .meta{flex:1;min-width:140px}
+.resume-item .meta .v{font-weight:600;font-size:14px}
+.resume-item .meta .t{font-size:12px;color:var(--muted)}
+.resume-item .latest{font-size:11px;background:#dcfce7;color:#15803d;padding:1px 8px;border-radius:999px}
+.pdf-frame{width:100%;height:70vh;border:1px solid var(--line);border-radius:10px;margin-top:12px;background:#fff}
+/* 侧栏 */
+.side .card{margin-top:16px}
+.prog-bar{height:8px;border-radius:99px;background:#e5e7eb;overflow:hidden;margin-top:8px}
+.prog-bar>i{display:block;height:100%;background:var(--blue);border-radius:99px;transition:width .3s}
+.side ul{list-style:none;margin-top:10px;font-size:13px}
+.side li{padding:4px 0;color:var(--muted)}
+.side li.done{color:var(--green)}
+.empty{color:var(--muted);font-size:13px;padding:8px 0}
+.hint{font-size:12px;color:var(--muted);margin-top:4px}
+.notice-err{position:sticky;top:60px;z-index:15;background:#fef2f2;border:1px solid #fecaca;color:var(--red);border-radius:10px;padding:10px 14px;margin-top:12px;font-size:13px;display:none}
+/* 模板选择 */
+.tpl-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tpl-card{border:2px solid var(--line);border-radius:12px;overflow:hidden;cursor:pointer;background:#fff;transition:border-color .15s}
+.tpl-card.active{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.15)}
+.tpl-thumb{height:170px;overflow:hidden;background:#f3f4f6}
+.tpl-thumb img{width:100%;height:100%;display:block;object-fit:cover;object-position:top}
+.tpl-info{padding:10px 12px}
+.tpl-name{font-weight:700;font-size:14px}
+.tpl-badge{font-size:11px;color:var(--blue);border:1px solid var(--blue);border-radius:999px;padding:1px 8px;font-weight:600;white-space:nowrap}
+.tpl-desc{font-size:12px;color:var(--muted);margin:4px 0 6px;line-height:1.5}
+.tpl-sample{font-size:12px;color:var(--blue);text-decoration:none}
+.zoom-mask{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:99;overflow:auto;display:flex;justify-content:center;padding:16px;-webkit-overflow-scrolling:touch}
+.zoom-mask img{width:min(680px,100%);height:auto;align-self:flex-start;border-radius:4px}
+/* ---------- 图片放大查看器（v1.6） ---------- */
+.lb{position:fixed;inset:0;z-index:130;background:rgba(15,23,42,.95);display:flex;flex-direction:column;-webkit-overflow-scrolling:touch}
+.lb-bar{flex:none;display:flex;align-items:center;gap:8px;padding:10px 12px;color:#fff}
+.lb-count{font-size:13px;font-variant-numeric:tabular-nums;opacity:.9;flex:none}
+.lb-name{flex:1;min-width:0;font-size:12px;opacity:.7;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-btn{background:rgba(255,255,255,.16);border:none;color:#fff;border-radius:8px;padding:7px 11px;font-size:13px;cursor:pointer;flex:none}
+.lb-btn:active{background:rgba(255,255,255,.3)}
+.lb-stage{flex:1;min-height:0;position:relative;display:flex;align-items:center;justify-content:center;padding:0 8px;overflow:hidden}
+.lb-stage img{max-width:100%;max-height:100%;object-fit:contain;border-radius:6px;background:#fff;cursor:zoom-in}
+.lb-zoom .lb-stage{overflow:auto;align-items:flex-start;justify-content:flex-start;display:block}
+.lb-zoom .lb-stage img{max-width:none;max-height:none;width:auto;height:auto;margin:0 auto;display:block;cursor:zoom-out}
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:42px;height:42px;border-radius:50%;border:none;background:rgba(0,0,0,.5);color:#fff;font-size:22px;line-height:1;cursor:pointer;z-index:2}
+.lb-nav.prev{left:6px}
+.lb-nav.next{right:6px}
+.lb-file{flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:#fff;text-align:center;padding:24px}
+.lb-file .fn{font-size:14px;word-break:break-all;max-width:420px}
+.lb-cap{flex:none;text-align:center;color:rgba(255,255,255,.62);font-size:12px;padding:10px 12px 16px;line-height:1.6}
+@media (max-width:480px){.lb-cap{font-size:11px}}
+@media (max-width:480px){.tpl-thumb{height:130px}.tpl-desc{display:none}}
+/* OCR 草稿弹窗 */
+.ocr-mask{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px;-webkit-overflow-scrolling:touch}
+.ocr-modal{background:#fff;border-radius:14px;width:min(560px,100%);max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.18)}
+.ocr-modal header{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ocr-modal header h3{font-size:15px;flex:1;min-width:0}
+.ocr-modal header .badge-ocr{font-size:11px;padding:2px 8px;border-radius:99px;background:#e0e7ff;color:#4338ca;font-weight:600}
+.ocr-modal header .badge-ocr.cache{background:#dcfce7;color:#15803d}
+.ocr-modal header .badge-ocr.low{background:#fef2f2;color:var(--red)}
+.ocr-modal header .meta{font-size:12px;color:var(--muted);margin-left:auto;flex:none}
+.ocr-modal .body{padding:14px 18px;overflow:auto;-webkit-overflow-scrolling:touch}
+.ocr-modal .body label{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.ocr-modal .body label .lk{font-size:12px;color:var(--muted);font-weight:400}
+.ocr-modal .footer{padding:12px 18px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap}
+.ocr-modal .footer .left{display:flex;gap:8px;flex-wrap:wrap}
+.ocr-modal .footer .right{display:flex;gap:8px}
+.ocr-preview{width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid var(--line);float:right;margin-left:10px;cursor:zoom-in}
+.ocr-hints{margin-top:10px;padding:8px 10px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;font-size:12px;color:#92400e}
+.ocr-hints ul{margin:4px 0 0 18px;padding:0}
+.ocr-raw{margin-top:10px;padding:8px 10px;background:#f9fafb;border:1px solid var(--line);border-radius:8px;font-size:12px;color:var(--muted);white-space:pre-wrap;word-break:break-all}
+.ocr-error{margin-bottom:10px;padding:10px 12px;background:#fef2f2;border:1px solid #fecaca;color:#dc2626;border-radius:8px;font-size:13px;line-height:1.5}
+.field-low{background:#fef2f2 !important;border-color:var(--red) !important}
+/* OCR 识别中全屏阻断遮罩（z-index 高于弹窗 100，识别期间页面不可点） */
+.ocr-loading-mask{position:fixed;inset:0;background:rgba(15,23,42,.62);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px}
+.ocr-loading-box{background:#fff;border-radius:14px;padding:28px 30px 22px;text-align:center;max-width:340px;width:100%;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+.ocr-loading-box .spin-big{display:block;width:34px;height:34px;margin:0 auto;border:4px solid rgba(37,99,235,.2);border-top-color:var(--blue);border-radius:50%;animation:spin 1s linear infinite}
+.ocr-loading-box .t{font-weight:600;font-size:15px;margin-top:14px;color:var(--text)}
+.ocr-loading-box .sub{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.5}
+.ocr-loading-box .elapsed{font-size:13px;color:var(--blue);margin-top:10px;font-weight:600;font-variant-numeric:tabular-nums}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin 1s linear infinite;vertical-align:-2px}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body data-page-node-id="oOGFql1EDPUoUHAlIxMZHR">
+<header class="top" data-page-node-id="DNCCTn09GC7JIDhWg5UAtr">
+  <div class="top-inner" data-page-node-id="JdvnWwaI185VtUZVIlL060">
+    <h1 id="stu-name" data-page-node-id="hWGlhs6YKE0NOL5s2SpAw3">小升初简历材料</h1>
+    <span id="status-badge" class="badge collecting" data-page-node-id="7Fbpn8i6nPliV7xpbJbND8">填写中</span>
+    <span class="ver" id="ver" data-page-node-id="SadhVXC10jeMGCuPTtz3bE"></span>
+    <span class="save-hint" id="save-hint" data-page-node-id="ImeaBev40bErGeMBHXZeHS"></span>
+  </div>
+</header>
+<div class="layout" data-page-node-id="75t71s2J5SvArX5Z4BfC1R">
+  <div id="banners" data-page-node-id="cnxbiqdoSuiUWvX4M5mEd9"></div>
+  <div class="notice-err" id="net-err" data-page-node-id="BIUKUZ8qMTcKhClZ0arYlN"></div>
+  <div class="cols" data-page-node-id="P8dZoNg0kNGM0etYL8lKD8">
+    <div class="main" id="main" data-page-node-id="pPxImPXOpySq8TXKvY8UTw"><p class="empty" data-page-node-id="SQfgxZecIjQ3dr6sqMsG34">加载中…</p></div>
+    <aside class="side" id="side" data-page-node-id="BNQf73bCh5jHtOEKVTijIJ"></aside>
+  </div>
+</div>
+
+<script>
+"use strict";
+const TOKEN = decodeURIComponent(location.pathname.split("/")[2] || "");
+const TQ = "?token=" + encodeURIComponent(TOKEN);
+const LS_KEY = "xsc-pending-" + TOKEN;
+let state = null;
+
+/* ---------- 基础工具 ---------- */
+const $ = (s, el) => (el || document).querySelector(s);
+const $$ = (s, el) => Array.from((el || document).querySelectorAll(s));
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+function saveHint(txt, cls) {
+  const el = $("#save-hint");
+  el.textContent = txt || "";
+  el.className = "save-hint " + (cls || "");
+}
+
+async function api(path, opts = {}) {
+  opts.headers = Object.assign({ Authorization: "Bearer " + TOKEN }, opts.headers || {});
+  if (opts.json !== undefined) {
+    opts.method = opts.method || "POST";
+    opts.headers["Content-Type"] = "application/json";
+    opts.body = JSON.stringify(opts.json);
+    delete opts.json;
+  }
+  // 允许通过 opts.signal 传入 AbortSignal；未传则不绑定
+  const res = await fetch(path, opts);
+  if (res.status === 204) return null;
+  const data = await res.json().catch(() => null);
+  if (!data || data.ok === false) {
+    const err = new Error((data && data.error && data.error.message) || ("请求失败 " + res.status));
+    err.code = data && data.error && data.error.code;
+    throw err;
+  }
+  return data.data;
+}
+
+/* 保存失败 localStorage 兜底 + 红色提示 */
+function pushPending(item) {
+  try {
+    const arr = JSON.parse(localStorage.getItem(LS_KEY) || "[]");
+    arr.push(Object.assign({ ts: Date.now() }, item));
+    localStorage.setItem(LS_KEY, JSON.stringify(arr.slice(-20)));
+  } catch (e) {}
+  showNetErr();
+}
+function showNetErr() {
+  let arr = [];
+  try { arr = JSON.parse(localStorage.getItem(LS_KEY) || "[]"); } catch (e) {}
+  const el = $("#net-err");
+  if (!arr.length) { el.style.display = "none"; return; }
+  el.style.display = "block";
+  el.innerHTML = "有 " + arr.length + " 处修改保存失败（已在本机暂存）。请检查网络后 <a href='javascript:void 0' id='retry-save'>点击重试</a>";
+  $("#retry-save").onclick = retryPending;
+}
+async function retryPending() {
+  let arr = [];
+  try { arr = JSON.parse(localStorage.getItem(LS_KEY) || "[]"); } catch (e) {}
+  const rest = [];
+  for (const it of arr) {
+    try { await api(it.path, { method: it.method, json: it.body }); }
+    catch (e) { rest.push(it); }
+  }
+  localStorage.setItem(LS_KEY, JSON.stringify(rest));
+  showNetErr();
+  load(true);
+}
+
+/* 自动保存（debounce 800ms） */
+const debouncers = new Map();
+function autoSave(key, fn) {
+  const old = debouncers.get(key);
+  if (old) clearTimeout(old);
+  debouncers.set(key, setTimeout(async () => {
+    saveHint("保存中…", "saving");
+    try { await fn(); saveHint("已自动保存 " + new Date().toLocaleTimeString("zh-CN", { hour12: false })); }
+    catch (e) { saveHint("保存失败", "err"); }
+  }, 800));
+}
+
+/* ---------- 图片预压缩（v1.7） ----------
+   家长手机直出照片常 3–10MB：上传慢、占 R2、PDF 导出臃肿，OCR 还有 4MB 硬上限。
+   因此上传前在浏览器内压缩：长边降采样 + JPEG 重编码。分级标准：
+   - 证书/作品图：长边 2560px —— OCR 认字、PDF 半页印刷、网页放大查看都够用；
+   - 证件照：长边 1600px —— 简历印刷仅约 2 寸，已留足裁切余量；
+   - <1MB 的小图原样上传，避免二次编码损失画质；
+   - 压缩后反而更大（极少数高噪点 PNG）则保留原文件；
+   - 环境不支持 canvas（如冒烟测试 jsdom）时静默回退原图，不影响上传。 */
+function decodeImageViaImg(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => { URL.revokeObjectURL(url); resolve({ width: img.naturalWidth, height: img.naturalHeight, draw: (ctx, w, h) => ctx.drawImage(img, 0, 0, w, h) }); };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("图片解码失败")); };
+    img.src = url;
+  });
+}
+function decodeImage(file) {
+  // createImageBitmap + from-image 能正确处理手机照片的 EXIF 旋转；不支持则降级 <img>
+  if (typeof createImageBitmap === "function") {
+    return createImageBitmap(file, { imageOrientation: "from-image" })
+      .then((bmp) => ({ width: bmp.width, height: bmp.height, draw: (ctx, w, h) => { ctx.drawImage(bmp, 0, 0, w, h); if (bmp.close) bmp.close(); } }))
+      .catch(() => decodeImageViaImg(file));
+  }
+  return decodeImageViaImg(file);
+}
+/**
+ * 上传前压缩图片；不满足条件或环境不支持时原样返回。
+ * @param {File} file
+ * @param {{maxEdge:number, quality:number}} opt
+ * @returns {Promise<File>} 压缩后的 File（image/jpeg）或原 File
+ */
+async function maybeCompressImage(file, opt) {
+  try {
+    if (!file || !(file.type || "").startsWith("image/")) return file;
+    if (file.size < 1024 * 1024) return file; // 小图不再二次编码
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext && canvas.getContext("2d");
+    if (!ctx) return file; // 环境不支持（如测试环境 jsdom）
+    const src = await decodeImage(file);
+    const scale = Math.min(1, opt.maxEdge / Math.max(src.width, src.height));
+    // 尺寸没超且体积 <2MB：重编码意义不大，原样上传
+    if (scale >= 1 && file.size < 2 * 1024 * 1024) return file;
+    const w = Math.max(1, Math.round(src.width * scale));
+    const h = Math.max(1, Math.round(src.height * scale));
+    canvas.width = w; canvas.height = h;
+    ctx.fillStyle = "#fff"; // PNG 透明底铺白，避免转 JPEG 后发黑
+    ctx.fillRect(0, 0, w, h);
+    src.draw(ctx, w, h);
+    // 逐级降质直到 ≤3MB（给 OCR 的 4MB 硬上限留 1MB 余量）
+    let blob = null;
+    for (const q of [opt.quality, 0.72, 0.6]) {
+      blob = await new Promise((res) => canvas.toBlob(res, "image/jpeg", q));
+      if (!blob) return file; // toBlob 失败，保底用原图
+      if (blob.size <= 3 * 1024 * 1024) break;
+    }
+    if (blob.size >= file.size) return file; // 没压小就不替换
+    const name = (file.name || "image").replace(/\.[a-zA-Z0-9]{1,8}$/, "") + ".jpg";
+    return new File([blob], name, { type: "image/jpeg", lastModified: Date.now() });
+  } catch (e) {
+    console.warn("[compress] 压缩失败，改传原图:", e);
+    return file;
+  }
+}
+
+/* 带进度上传（XHR，失败自动重试一次） */
+function uploadFile(file, sectionType, itemId, onProg) {
+  return new Promise((resolve, reject) => {
+    const attempt = (isRetry) => {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("section_type", sectionType);
+      if (itemId) fd.append("item_id", itemId);
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", "/api/me/attachments");
+      xhr.setRequestHeader("Authorization", "Bearer " + TOKEN);
+      xhr.upload.onprogress = (e) => { if (e.lengthComputable && onProg) onProg(Math.round(e.loaded / e.total * 100)); };
+      xhr.onload = () => {
+        try {
+          const d = JSON.parse(xhr.responseText);
+          if (d && d.ok) return resolve(d.data);
+          if (!isRetry && xhr.status >= 500) return attempt(true);
+          reject(new Error((d && d.error && d.error.message) || "上传失败"));
+        } catch (e) {
+          if (!isRetry) return attempt(true);
+          reject(new Error("上传失败"));
+        }
+      };
+      xhr.onerror = () => { if (!isRetry) attempt(true); else reject(new Error("网络错误，上传失败")); };
+      xhr.send(fd);
+    };
+    attempt(false);
+  });
+}
+
+/* ---------- 状态展示 ---------- */
+const STATUS_TEXT = { collecting: "填写中", submitted: "待生成", exported: "生成中", review: "生成中", ready: "已生成" };
+
+function renderBanners() {
+  const s = state.student;
+  let html = "";
+  if (s.needs_regen) {
+    html += '<div class="banner red">新版本材料已提交，简历将重新生成（当前简历基于旧版材料）。</div>';
+  }
+  if (s.unsubmitted_changes) {
+    html += '<div class="banner yellow">您有未提交的修改——内容已自动保存，点击底部「提交材料」后老师才会为新版本生成简历。</div>';
+  }
+  if (s.status === "submitted" && !s.needs_regen && !s.unsubmitted_changes && state.resumes.length === 0) {
+    html += '<div class="banner yellow">材料已提交，等待生成简历。您仍可随时修改补充。</div>';
+  }
+  $("#banners").innerHTML = html;
+}
+
+/* ---------- 侧栏：进度 + 状态卡 ---------- */
+function computeProgress() {
+  const s = state.student, sec = state.sections;
+  const items = [];
+  items.push(["基本信息", !!(s.basic.gender && s.basic.birth_date && s.basic.primary_school && s.basic.hukou_district)]);
+  items.push(["孩子照片", !!s.basic.photo]);
+  items.push(["家庭成员（含电话）", state.contacts.some((c) => c.phone)]);
+  items.push(["核心学期成绩", sec.grades.some((g) => (s.city_config.core_semesters || []).includes(g.content.semester))]);
+  items.push(["获奖情况", sec.awards.length > 0]);
+  items.push(["兴趣特长", sec.talents.length > 0]);
+  items.push(["成长作品", sec.works.length > 0]);
+  const em = s.essay_material || {};
+  items.push(["自荐信素材", !!(em.personality && em.study_habits && em.highlights)]);
+  items.push(["家长寄语", !!s.family_note]);
+  items.push(["目标学校", sec.target_schools.length > 0]);
+  return items;
+}
+function renderSide() {
+  const items = computeProgress();
+  const done = items.filter((i) => i[1]).length;
+  const pct = Math.round(done / items.length * 100);
+  const s = state.student;
+  $("#side").innerHTML =
+    '<div class="card"><h2>填写进度</h2>' +
+    '<div class="prog-bar"><i style="width:' + pct + '%"></i></div>' +
+    '<ul>' + items.map((i) => '<li class="' + (i[1] ? "done" : "") + '">' + (i[1] ? "✓ " : "○ ") + esc(i[0]) + "</li>").join("") + "</ul></div>" +
+    '<div class="card"><h2>简历状态</h2><p style="font-size:13px;color:var(--muted)">' +
+    (s.needs_regen ? "材料已更新，等待重新生成" : { collecting: "填写中，完成后请点击底部「提交」", submitted: "已提交，等待生成", exported: "简历生成中，请稍候", ready: "最新简历已生成，可在「我的简历」查看" }[s.status]) +
+    "</p></div>";
+}
+
+/* ---------- 附件九宫格 ---------- */
+function thumbsHtml(list, sectionType, itemId) {
+  return '<div class="thumbs" data-sec="' + sectionType + '" data-item="' + (itemId || "") + '">' +
+    (list || []).map((a) => {
+      const isImg = (a.mime_type || "").startsWith("image/");
+      // v1.6: 带 data-att-name / data-att-mime，供放大查看器组装同组图片列表
+      return '<div class="thumb" data-att="' + a.id + '" data-att-name="' + esc(a.name || "") + '" data-att-mime="' + esc(a.mime_type || "") + '" title="点击放大查看">' +
+        (isImg ? '<img loading="lazy" src="/api/me/attachments/' + a.id + TQ + '" alt="">' : '<div class="file-tag">' + esc(a.name) + "</div>") +
+        '<span class="zoom-hint">' + (isImg ? "🔍 点击放大" : "📄 打开") + "</span>" +
+        '<button class="del" title="删除" data-del-att="' + a.id + '">×</button>' +
+        '<div class="prog"></div></div>';
+    }).join("") +
+    '<div class="thumb" style="display:flex;align-items:center;justify-content:center;border-style:dashed;cursor:pointer" data-upload="' + sectionType + '" data-item="' + (itemId || "") + '">' +
+    '<span style="color:var(--blue);font-size:13px">+ 上传</span></div></div>' +
+    '<div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap">' +
+    // v1.5: awards / talents / works 三个板块都支持 AI 识别（此前只有 awards）
+    // data-ocr-award 保留以兼容既有选择器；新逻辑统一走 data-vision + data-item
+    (function () {
+      const vk = visionKindOf(sectionType);
+      if (!vk || !itemId) return "";
+      const cfg = VISION_KINDS[vk];
+      return '<button class="btn sm" data-vision="' + vk + '" data-item="' + itemId + '"' +
+        (vk === "award" ? ' data-ocr-award="' + itemId + '"' : "") +
+        ' style="color:var(--blue);border-color:var(--blue)">' + cfg.btnIcon + " " + cfg.btnLabel + "</button>";
+    })() +
+    '</div>' +
+    '<input type="file" hidden multiple accept="image/*,.pdf,.doc,.docx" data-file-for="' + sectionType + "|" + (itemId || "") + '">';
+}
+
+/* ---------- 图片放大查看器（v1.6） ----------
+   家长上传后只看到小缩略图，往往认不出自己传的是什么证书。
+   因此所有缩略图 / 证件照 / 模板预览都可点击放大，并支持左右翻看同一组图片。 */
+let lbState = null; // { items, idx, el }
+const attUrl = (it) => it.url || (it.id ? "/api/me/attachments/" + it.id + TQ : "");
+const isImgItem = (it) => (it.mime_type || "image/").startsWith("image/");
+
+function openLightbox(items, idx) {
+  const list = (items || []).filter(Boolean);
+  if (!list.length) return;
+  closeLightbox();
+  const el = document.createElement("div");
+  el.className = "lb";
+  el.innerHTML =
+    '<div class="lb-bar">' +
+      '<span class="lb-count"></span>' +
+      '<span class="lb-name"></span>' +
+      '<button class="lb-btn" data-lb="open">打开原图</button>' +
+      '<button class="lb-btn" data-lb="close">关闭 ✕</button>' +
+    "</div>" +
+    '<div class="lb-stage">' +
+      '<img alt="放大预览">' +
+      '<div class="lb-file" hidden></div>' +
+      '<button class="lb-nav prev" data-lb="prev" aria-label="上一张">‹</button>' +
+      '<button class="lb-nav next" data-lb="next" aria-label="下一张">›</button>' +
+    "</div>" +
+    '<div class="lb-cap">点图片切换「适应屏幕 / 原图1:1」· ← → 或左右滑动翻页 · 点空白处或按 Esc 关闭</div>';
+  document.body.appendChild(el);
+  document.body.style.overflow = "hidden";
+  lbState = { items: list, idx: Math.max(0, Math.min(idx | 0, list.length - 1)), el, dx: 0 };
+
+  el.addEventListener("click", (e) => {
+    const act = e.target.closest("[data-lb]");
+    if (act) {
+      const a = act.dataset.lb;
+      if (a === "close") closeLightbox();
+      else if (a === "open") window.open(attUrl(lbState.items[lbState.idx]), "_blank", "noopener");
+      else if (a === "prev") lbGo(-1);
+      else if (a === "next") lbGo(1);
+      return;
+    }
+    const img = e.target.closest(".lb-stage img");
+    if (img && isImgItem(lbState.items[lbState.idx])) { el.classList.toggle("lb-zoom"); return; }
+    if (e.target === el || e.target.classList.contains("lb-stage") || e.target.classList.contains("lb-cap")) closeLightbox();
+  });
+
+  // 移动端左右滑动翻页
+  let sx = 0, sy = 0;
+  el.addEventListener("touchstart", (e) => { const t = e.touches[0]; sx = t.clientX; sy = t.clientY; lbState.dx = 0; }, { passive: true });
+  el.addEventListener("touchmove", (e) => {
+    const t = e.touches[0];
+    lbState.dx = t.clientX - sx;
+    if (Math.abs(t.clientY - sy) > Math.abs(lbState.dx)) lbState.dx = 0; // 竖向滚动不算翻页
+  }, { passive: true });
+  el.addEventListener("touchend", () => { if (Math.abs(lbState.dx) > 45) lbGo(lbState.dx < 0 ? 1 : -1); }, { passive: true });
+
+  lbRender();
+}
+
+function lbGo(delta) {
+  if (!lbState) return;
+  const n = lbState.items.length;
+  lbState.idx = (lbState.idx + delta + n) % n;
+  lbState.el.classList.remove("lb-zoom");
+  lbState.el.querySelector(".lb-stage").scrollTop = 0;
+  lbRender();
+}
+
+function lbRender() {
+  if (!lbState) return;
+  const { items, idx, el } = lbState;
+  const it = items[idx] || {};
+  const url = attUrl(it);
+  const img = el.querySelector(".lb-stage img");
+  const fileBox = el.querySelector(".lb-file");
+  const multi = items.length > 1;
+  el.querySelector(".lb-count").textContent = multi ? idx + 1 + " / " + items.length : "";
+  el.querySelector(".lb-name").textContent = it.name || "";
+  el.querySelector(".lb-nav.prev").style.display = multi ? "" : "none";
+  el.querySelector(".lb-nav.next").style.display = multi ? "" : "none";
+  if (isImgItem(it)) {
+    img.hidden = false;
+    img.src = url;
+    fileBox.hidden = true;
+  } else {
+    img.hidden = true;
+    img.removeAttribute("src");
+    fileBox.hidden = false;
+    fileBox.innerHTML = '<div style="font-size:44px">📄</div>' +
+      '<div class="fn">' + esc(it.name || "文件") + "</div>" +
+      '<button class="lb-btn" data-lb="open">在新标签打开</button>';
+  }
+}
+
+function closeLightbox() {
+  if (!lbState) return;
+  if (lbState.el && lbState.el.parentNode) lbState.el.remove();
+  document.body.style.overflow = "";
+  lbState = null;
+}
+
+document.addEventListener("keydown", (e) => {
+  if (!lbState) return;
+  if (e.key === "Escape") closeLightbox();
+  else if (e.key === "ArrowLeft") lbGo(-1);
+  else if (e.key === "ArrowRight") lbGo(1);
+});
+
+async function handleUpload(input) {
+  const [sectionType, itemId] = input.dataset.fileFor.split("|");
+  const files = Array.from(input.files || []);
+  if (!files.length) return;
+  for (const f of files) {
+    try {
+      saveHint("上传中…", "saving");
+      // v1.7: 上传前先压缩（证书/作品图档：长边 2560px，兼顾 OCR 认字与 PDF 印刷）
+      const up = await maybeCompressImage(f, { maxEdge: 2560, quality: 0.82 });
+      if (up !== f) saveHint("图片已压缩 " + (f.size / 1048576).toFixed(1) + "MB → " + (up.size / 1048576).toFixed(1) + "MB，上传中…", "saving");
+      const att = await uploadFile(up, sectionType, itemId || null, (p) => saveHint("上传中 " + p + "%", "saving"));
+      // ★ v1.4 fix: 上传成功后立即把附件 id 绑定到对应 section 的 cert_images / images。
+      //   否则 PDF 上传、点「仅添加图片/取消」、OCR 报错等任意一条路径都会出现
+      //   「后端 attachments 表已存、R2 已存，但前端 9 宫格仍显示 + 上传」的诡异空白。
+      //   同时「自动识别这张证书」「一键识别全部」按钮也都靠 cert_images 找图，
+      //   不绑定就连这两按钮都搜不到刚上传的图片。
+      if (itemId) {
+        const cur = findSection(itemId);
+        if (cur) {
+          const field = sectionType === "works" ? "images" : "cert_images";
+          const curArr = Array.isArray(cur.content[field]) ? cur.content[field] : [];
+          const ids = curArr.map((a) => (typeof a === "string" ? a : a.id));
+          if (!ids.includes(att.id)) {
+            const content = Object.assign({}, cur.content, { [field]: [...ids, att.id] });
+            try {
+              await api("/api/me/sections/" + itemId, { method: "PUT", json: { content } });
+            } catch (e) {
+              console.warn("[upload] 绑定附件到 section 失败，图片仍可单独预览:", e);
+            }
+          }
+        }
+      }
+      // v1.5: awards / talents / works 上传图片后自动触发 AI 识别
+      const vk = visionKindOf(sectionType);
+      if (vk && itemId && (f.type || "").startsWith("image/")) {
+        const vkCfg = VISION_KINDS[vk];
+        saveHint("AI 识别中…");
+        showOcrLoading(vkCfg.loading);
+        try {
+          const data = await callVision(vk, att.id);
+          hideOcrLoading();
+          // 弹「识别草稿」modal，让家长确认
+          openOcrModal({
+            kind: vk,
+            attachment_id: att.id,
+            image_url: att.url,
+            ocr: data,
+            onConfirm: async (fields) => {
+              // 把字段写回对应条目（覆盖除附件引用外的所有字段）
+              const cur = findSection(itemId);
+              if (!cur) throw new Error("找不到对应条目（itemId=" + itemId + "），可能已被删除。");
+              const content = Object.assign({}, cur.content, fields);
+              const ref = vkCfg.refField; // awards/talents 用 cert_images，works 用 images
+              if (Array.isArray(content[ref])) content[ref] = content[ref].map((a) => a.id);
+              await api("/api/me/sections/" + itemId, { method: "PUT", json: { content } });
+              await load(true);
+            },
+          });
+        } catch (e) {
+          hideOcrLoading();
+          console.warn("AI 识别自动触发失败：", e);
+          alert("图片已上传，但 AI 识别失败（" + e.message + "）。您可手动填写，或点「" + vkCfg.btnIcon + " " + vkCfg.btnLabel + "」按钮重试。");
+        }
+      }
+    } catch (e) {
+      alert("「" + f.name + "」上传失败：" + e.message);
+    }
+  }
+  saveHint("已上传");
+  await load(true);
+}
+
+/* ---------- 视觉识别（v1.5：award / talent / work 三种） ---------- */
+// 三种识别的元信息：接口路径、按钮文案、加载提示、附件引用字段名
+const VISION_KINDS = {
+  award: {
+    api: "award",
+    btnIcon: "📷",
+    btnLabel: "自动识别这张证书",
+    loading: "AI 正在识别证书…",
+    title: "📷 识别草稿",
+    refField: "cert_images",
+    emptyTip: "请先上传证书图片（支持 JPG/PNG/WebP），再使用自动识别。",
+  },
+  talent: {
+    api: "talent",
+    btnIcon: "📷",
+    btnLabel: "自动识别这张证书",
+    loading: "AI 正在识别特长证书…",
+    title: "📷 识别草稿",
+    refField: "cert_images",
+    emptyTip: "请先上传证书图片（支持 JPG/PNG/WebP），再使用自动识别。",
+  },
+  work: {
+    api: "work",
+    btnIcon: "✨",
+    btnLabel: "AI 看图说话",
+    loading: "AI 正在看这张作品…",
+    title: "✨ AI 看图说话",
+    refField: "images",
+    emptyTip: "请先上传作品照片（支持 JPG/PNG/WebP），再使用 AI 看图说话。",
+  },
+};
+/** section 类型 → 识别类型 */
+function visionKindOf(sectionType) {
+  if (sectionType === "awards") return "award";
+  if (sectionType === "talents") return "talent";
+  if (sectionType === "works") return "work";
+  return null;
+}
+
+async function callVision(kind, attachmentId) {
+  const cfg = VISION_KINDS[kind] || VISION_KINDS.award;
+  const r = await fetch("/api/me/ocr/" + cfg.api, {
+    method: "POST",
+    headers: { Authorization: "Bearer " + TOKEN, "Content-Type": "application/json" },
+    body: JSON.stringify({ attachment_id: attachmentId }),
+  });
+  const d = await r.json().catch(() => null);
+  if (!d || d.ok === false) throw new Error((d && d.error && d.error.message) || ("请求失败 " + r.status));
+  return d.data;
+}
+/** 兼容旧调用（获奖证书） */
+async function callOcrAward(attachmentId) {
+  return callVision("award", attachmentId);
+}
+async function clearOcrCache(attachmentId, kind) {
+  await fetch("/api/me/ocr/cache/" + attachmentId + (kind ? "?kind=" + encodeURIComponent(kind) : ""), {
+    method: "DELETE",
+    headers: { Authorization: "Bearer " + TOKEN },
+  });
+}
+/**
+ * v1.5: 按识别类型渲染 modal 中间的可编辑字段区。
+ * award → 赛事/科目/级别/名次/时间；talent → 分类/名称/年限/级别；work → 名称/介绍。
+ */
+function buildVisionFieldsHtml(kind, f, isLow) {
+  const fieldLow = (k) => (isLow && !f[k] ? "field-low" : "");
+
+  if (kind === "talent") {
+    return '<div class="row2"><div><label>分类</label><select data-of="category">' +
+      ["", "科创", "艺术", "体育", "学科", "其他"].map((s) => '<option value="' + s + '"' + (f.category === s ? " selected" : "") + ">" + (s || "请选择") + "</option>").join("") + '</select></div>' +
+      '<div><label>坚持年限（年）</label><input data-of="years" value="' + esc(f.years) + '" placeholder="如 3"></div></div>' +
+      '<label>特长名称</label><input data-of="title" value="' + esc(f.title) + '" class="' + fieldLow("title") + '" placeholder="如 钢琴、少儿编程、围棋">' +
+      '<label>级别 / 机构 / 成果</label><textarea data-of="description" class="' + fieldLow("description") + '" placeholder="如 拾级、中国音乐学院、成绩优秀">' + esc(f.description) + "</textarea>" +
+      '<p class="hint" style="margin:8px 0 0;font-size:12px;color:var(--muted)">坚持年限多数证书上不印，请家长据实补填。</p>';
+  }
+
+  if (kind === "work") {
+    return '<label>作品名称</label><input data-of="title" value="' + esc(f.title) + '" class="' + fieldLow("title") + '" placeholder="如 智能浇花装置">' +
+      '<label>作品介绍</label><textarea data-of="description" class="' + fieldLow("description") + '" style="min-height:130px" placeholder="这是什么、用了什么材料、看起来实现什么功能…">' + esc(f.description) + "</textarea>" +
+      '<p class="hint" style="margin:8px 0 0;font-size:12px;color:var(--muted)">' +
+      'AI 只写画面里<b>看得见</b>的东西。获奖、名次、机构、时间这些 AI 从照片判断不了，' +
+      '请家长核对后<b>自行补充</b>；描述里若出现夸张词句，建议改成平实陈述再保存。</p>';
+  }
+
+  // award（默认）
+  const cups = state.student.city_config.cups || [];
+  return '<label>赛事/荣誉全称 <span class="lk">（建议用正式全称）</span></label>' +
+    '<input data-of="name" value="' + esc(f.name) + '" class="' + fieldLow("name") + '">' +
+    '<label>快捷选择（本市竞赛字典）</label>' +
+    '<select data-of="cup">' +
+    '<option value="">其他 / 不在下拉</option>' +
+    cups.map((c) => '<option value="' + esc(c.short) + '"' + (f.cup_short === c.short ? " selected" : "") + ">" + esc(c.short) + "｜" + esc(c.name) + "（" + esc(c.tier) + "）</option>").join("") +
+    '</select>' +
+    '<div class="row2"><div><label>科目</label><select data-of="subject">' +
+    ["", "数学", "英语", "科创", "信息学", "语文", "艺术", "体育", "综合"].map((s) => '<option value="' + s + '"' + (f.subject === s ? " selected" : "") + ">" + (s || "请选择") + "</option>").join("") + '</select></div>' +
+    '<div><label>主办方</label><input data-of="org" value="' + esc(f.org) + '"></div></div>' +
+    '<div class="row3"><div><label>级别</label><select data-of="level">' +
+    ["", "国家级", "省级", "市级", "区级", "校级"].map((s) => '<option value="' + s + '"' + (f.level === s ? " selected" : "") + ">" + (s || "请选择") + "</option>").join("") + '</select></div>' +
+    '<div><label>等级/名次</label><input data-of="rank" value="' + esc(f.rank) + '" placeholder="如 二等奖"></div>' +
+    '<div><label>获奖时间</label><input data-of="date" value="' + esc(f.date) + '" placeholder="如 2025-06"></div></div>' +
+    '<label>补充说明</label><input data-of="description" value="' + esc(f.description) + '" placeholder="如 决赛二等奖">';
+}
+
+function buildOcrModalHtml(opts) {
+  const f = opts.ocr.fields || {};
+  const isCache = opts.ocr.source === "cache";
+  const isLow = opts.ocr.confidence === "low";
+  const badgeCls = isCache ? "badge-ocr cache" : isLow ? "badge-ocr low" : "badge-ocr";
+  const badgeTxt = isCache ? "命中缓存" : isLow ? "低置信度" : "AI 识别";
+  const meta = (opts.ocr.model || "") + (opts.ocr.duration_ms ? " · " + (opts.ocr.duration_ms / 1000).toFixed(1) + "s" : "");
+  const fieldLow = (k) => isLow && !f[k] ? "field-low" : "";
+  const vKind = opts.kind || "award";
+  const vCfg = VISION_KINDS[vKind] || VISION_KINDS.award;
+  let h = '<div class="ocr-mask" id="ocr-modal-mask">' +
+    // 注意：这里不能放内联 onclick="event.stopPropagation()"——
+    // 它会阻断事件冒泡，导致绑在 modal 元素（旧版是 mask）上的委托监听器收不到 click，
+    // 表现为「确认导入/取消点了没反应且 console 无输出」。mask 背景点击本就无行为，无需 stopPropagation。
+    '<div class="ocr-modal">' +
+    '<header><h3>' + vCfg.title + '</h3>' +
+    '<span class="' + badgeCls + '">' + badgeTxt + '</span>' +
+    '<span class="meta">' + esc(meta) + '</span></header>' +
+    '<div class="body">' +
+    // v1.6: 识别草稿里的预览图也可点击放大（图片本体不在 .thumbs 里，用 data-zoom-url 兜底）
+    '<img class="ocr-preview" title="点击放大查看" data-zoom-url="' + esc(opts.image_url) + (opts.image_url.indexOf("?") >= 0 ? "&" : "?") + "token=" + encodeURIComponent(TOKEN) + '" src="' + esc(opts.image_url) + (opts.image_url.indexOf("?") >= 0 ? "&" : "?") + "token=" + encodeURIComponent(TOKEN) + '" alt="图片预览">' +
+    buildVisionFieldsHtml(vKind, f, isLow);
+  if ((opts.ocr.hints || []).length) {
+    h += '<div class="ocr-hints"><b>识别提示：</b><ul>' +
+      opts.ocr.hints.map((x) => "<li>" + esc(x) + "</li>").join("") + "</ul></div>";
+  }
+  if (opts.ocr.raw_text) {
+    h += '<details style="margin-top:10px"><summary style="cursor:pointer;color:var(--muted);font-size:12px">查看原始识别文本</summary>' +
+      '<div class="ocr-raw">' + esc(opts.ocr.raw_text) + '</div></details>';
+  }
+  h += '</div>' +
+    '<div class="footer">' +
+    '<div class="left">' +
+    '<button class="btn sm" data-ocr-action="reocr" style="border:0;background:transparent;color:var(--muted);font-weight:400">🔁 重新识别</button>' +
+    '<button class="btn sm" data-ocr-action="addonly" style="border:0;background:transparent;color:var(--muted);font-weight:400;text-decoration:underline">仅添加图片不导入字段</button>' +
+    '</div>' +
+    '<div class="right">' +
+    '<button class="btn sm" data-ocr-action="cancel">取消</button>' +
+    '<button class="btn sm primary" data-ocr-action="confirm">确认导入</button>' +
+    '</div></div>' +
+    '</div></div>';
+  return h;
+}
+/* OCR 识别中全屏阻断遮罩：识别通常 10–60 秒，期间锁死整个页面，防止用户误点跳转/刷新中断 */
+let ocrLoadingTimer = null;
+function showOcrLoading(text) {
+  hideOcrLoading();
+  const el = document.createElement("div");
+  el.id = "ocr-loading-mask";
+  el.className = "ocr-loading-mask";
+  el.innerHTML = '<div class="ocr-loading-box">' +
+    '<span class="spin-big"></span>' +
+    '<div class="t">' + esc(text || "AI 正在识别证书…") + '</div>' +
+    '<div class="sub">通常需要 10–60 秒<br>识别期间页面已锁定，请勿关闭、刷新或跳转</div>' +
+    '<div class="elapsed">已用时 0 秒</div></div>';
+  document.body.appendChild(el);
+  const t0 = Date.now();
+  ocrLoadingTimer = setInterval(() => {
+    const lab = el.querySelector(".elapsed");
+    if (lab) lab.textContent = "已用时 " + Math.round((Date.now() - t0) / 1000) + " 秒";
+  }, 1000);
+}
+function hideOcrLoading() {
+  if (ocrLoadingTimer) { clearInterval(ocrLoadingTimer); ocrLoadingTimer = null; }
+  const el = document.getElementById("ocr-loading-mask");
+  if (el) el.remove();
+}
+
+function openOcrModal(opts) {
+  closeOcrModal();
+  const wrap = document.createElement("div");
+  wrap.innerHTML = buildOcrModalHtml(opts);
+  document.body.appendChild(wrap.firstChild);
+  const mask = document.getElementById("ocr-modal-mask");
+  // 事件委托绑在弹窗本体上（而非外层 mask），避免 mask 层的任何 stopPropagation 拦截冒泡
+  const modal = mask.querySelector(".ocr-modal");
+  // v1.6: 识别草稿里的预览小图也支持点击放大
+  const ocrPrev = modal.querySelector(".ocr-preview[data-zoom-url]");
+  if (ocrPrev) ocrPrev.onclick = () => openLightbox([{ url: ocrPrev.dataset.zoomUrl, name: "证书原图", mime_type: "image/" }], 0);
+  // 字典选择 → 自动带出 name/subject/cup_tier
+  modal.addEventListener("change", (e) => {
+    const t = e.target;
+    if (t && t.dataset && t.dataset.of === "cup") {
+      const cup = (state.student.city_config.cups || []).find((c) => c.short === t.value);
+      if (cup) {
+        modal.querySelector('[data-of="name"]').value = cup.name;
+        modal.querySelector('[data-of="subject"]').value = cup.subject;
+      }
+    }
+  });
+  modal.addEventListener("click", async (e) => {
+    const btn = e.target.closest("[data-ocr-action]");
+    if (!btn) return;
+    const act = btn.dataset.ocrAction;
+    if (act === "cancel") {
+      closeOcrModal();
+      if (opts.onDismiss) opts.onDismiss("cancel");
+    } else if (act === "confirm") {
+      const fields = collectOcrFields(modal, opts.kind || "award");
+      // 视觉反馈：立即锁全部按钮 + 标题换成「导入中…」+ 全屏遮罩锁页面
+      lockOcrButtons(modal, true, "确认导入", "导入中…");
+      clearOcrError(modal);
+      showOcrLoading("正在导入识别结果…");
+      try {
+        await opts.onConfirm(fields);
+        hideOcrLoading();
+        closeOcrModal();
+      } catch (err) {
+        hideOcrLoading();
+        showOcrError(modal, err && err.message ? err.message : String(err));
+        lockOcrButtons(modal, false, "确认导入", "确认导入");
+      }
+    } else if (act === "addonly") {
+      // 家长明确选择「不导入字段，仅留图片」
+      closeOcrModal();
+      if (opts.onDismiss) opts.onDismiss("addonly");
+    } else if (act === "reocr") {
+      // 强制重新识别：先清该类型的缓存，再调识别；期间全屏阻断
+      const vk = opts.kind || "award";
+      try {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spin"></span> 识别中…';
+        showOcrLoading("正在重新识别…");
+        await clearOcrCache(opts.attachment_id, vk);
+        const data = await callVision(vk, opts.attachment_id);
+        hideOcrLoading();
+        openOcrModal(Object.assign({}, opts, { ocr: data }));
+      } catch (err) {
+        hideOcrLoading();
+        showOcrError(modal, "重新识别失败：" + err.message);
+        btn.disabled = false;
+        btn.textContent = "🔁 重新识别";
+      }
+    }
+  });
+}
+
+/** 把 modal 底部所有 action 按钮锁定/解锁；锁时 confirm 显示 loading 文本 */
+function lockOcrButtons(mask, locked, originalLabel, loadingLabel) {
+  const btns = mask.querySelectorAll("[data-ocr-action]");
+  btns.forEach((b) => {
+    if (locked) {
+      b.dataset.origDisabled = b.disabled ? "1" : "0";
+      b.disabled = true;
+    } else {
+      b.disabled = b.dataset.origDisabled === "1";
+      delete b.dataset.origDisabled;
+    }
+  });
+  const confirm = mask.querySelector('[data-ocr-action="confirm"]');
+  if (confirm) {
+    if (locked) {
+      confirm.innerHTML = '<span class="spin" style="color:#fff;border-color:rgba(255,255,255,.7)"></span>&nbsp;' + (loadingLabel || "处理中…");
+    } else {
+      confirm.innerHTML = originalLabel || "确认导入";
+    }
+  }
+}
+
+/** 在 modal body 顶部显示红色错误条（替代 alert，避免 iOS Safari 静默） */
+function showOcrError(mask, message) {
+  let el = mask.querySelector(".ocr-error");
+  if (!el) {
+    el = document.createElement("div");
+    el.className = "ocr-error";
+    // 插到 body 顶部、识别提示之前
+    const body = mask.querySelector(".body");
+    if (body) body.insertBefore(el, body.firstChild);
+  }
+  el.innerHTML = '<b>导入失败</b>：' + (message || "未知错误") +
+    '<br><span style="font-size:11px;color:var(--color-text-tertiary)">请检查网络或刷新页面后重试。如反复失败请把该截图发给我们。</span>';
+  el.style.display = "block";
+}
+function clearOcrError(mask) {
+  const el = mask.querySelector(".ocr-error");
+  if (el) el.style.display = "none";
+}
+function closeOcrModal() {
+  const m = document.getElementById("ocr-modal-mask");
+  if (m) m.remove();
+}
+function collectOcrFields(mask, kind) {
+  const get = (k) => {
+    const el = mask.querySelector('[data-of="' + k + '"]');
+    return el ? el.value : "";
+  };
+  // v1.5: 按识别类型收集，避免把 A 类型的字段写进 B 类型的条目
+  if (kind === "talent") {
+    return {
+      category: get("category"),
+      title: get("title"),
+      description: get("description"),
+      years: get("years"),
+    };
+  }
+  if (kind === "work") {
+    return {
+      title: get("title"),
+      description: get("description"),
+    };
+  }
+  // award
+  // 同步：若选了字典，重算 cup_short/cup_tier
+  const cupShort = get("cup");
+  const cup = (state.student.city_config.cups || []).find((c) => c.short === cupShort);
+  return {
+    name: get("name"),
+    cup_short: cup ? cup.short : "",
+    cup_tier: cup ? cup.tier : "",
+    subject: get("subject"),
+    org: get("org"),
+    level: get("level"),
+    rank: get("rank"),
+    date: get("date"),
+    description: get("description"),
+  };
+}
+
+/* ---------- 各板块渲染 ---------- */
+function basicHtml() {
+  const b = state.student.basic;
+  return '<div class="card"><h2><span class="n">1</span>基本信息</h2>' +
+    '<label>孩子姓名</label><input value="' + esc(state.student.name) + '" disabled title="姓名由老师创建，如需修改请联系老师">' +
+    '<div class="row2"><div><label>性别</label><select data-basic="gender">' +
+      ["", "男", "女"].map((g) => '<option value="' + g + '"' + (b.gender === g ? " selected" : "") + ">" + (g || "请选择") + "</option>").join("") + "</select></div>" +
+    '<div><label>出生日期</label><input type="date" data-basic="birth_date" value="' + esc(b.birth_date) + '"></div></div>' +
+    '<div class="row2"><div><label>毕业小学</label><input data-basic="primary_school" value="' + esc(b.primary_school) + '" placeholder="如：广州市天河区第一小学"></div>' +
+    '<div><label>户籍区</label><input data-basic="hukou_district" value="' + esc(b.hukou_district) + '" placeholder="如：天河区"></div></div>' +
+    '<label>孩子照片</label><div class="photo-wrap">' +
+    // v1.6: 证件照也可点击放大
+    (b.photo ? '<img class="photo-circle" style="cursor:zoom-in" title="点击放大查看" data-att="' + b.photo.id + '" data-att-name="' + esc(b.photo.name || "孩子照片") + '" data-att-mime="' + esc(b.photo.mime_type || "image/") + '" src="/api/me/attachments/' + b.photo.id + TQ + '">' : '<div class="photo-circle"></div>') +
+    '<div><button class="btn sm" id="photo-btn">上传 / 更换照片</button>' +
+    (b.photo ? ' <button class="btn sm danger" data-del-att="' + b.photo.id + '">删除</button>' : "") +
+    '<p class="hint">建议证件照或清晰半身照，JPG/PNG，10MB 以内</p></div></div>' +
+    '<input type="file" hidden id="photo-input" accept="image/*" capture="user"></div>';
+}
+
+function contactsHtml() {
+  let h = '<div class="card"><h2><span class="n">2</span>家庭成员</h2><p class="desc">至少填写一位监护人的联系电话</p>';
+  state.contacts.forEach((c) => {
+    h += '<div class="entry" data-contact="' + c.id + '"><div class="entry-head"><span class="t">' + esc(c.relation || "成员") + " " + esc(c.name) + '</span>' +
+      '<button class="btn sm danger" data-del-contact="' + c.id + '">删除</button></div>' +
+      '<div class="row2"><div><label>关系</label><select data-f="relation">' +
+      ["父亲", "母亲", "其他"].map((r) => '<option' + (c.relation === r ? " selected" : "") + ">" + r + "</option>").join("") + "</select></div>" +
+      '<div><label>姓名</label><input data-f="name" value="' + esc(c.name) + '"></div></div>' +
+      '<div class="row2"><div><label>工作单位</label><input data-f="work_unit" value="' + esc(c.work_unit) + '"></div>' +
+      '<div><label>职务</label><input data-f="title" value="' + esc(c.title) + '"></div></div>' +
+      '<label>联系电话</label><input data-f="phone" type="tel" value="' + esc(c.phone) + '"></div>';
+  });
+  h += '<button class="btn add block" data-add="contact">+ 添加家庭成员</button></div>';
+  return h;
+}
+
+function gradesHtml() {
+  const cfg = state.student.city_config;
+  const core = cfg.core_semesters || [];
+  let h = '<div class="card"><h2><span class="n">3</span>学业成绩</h2>' +
+    '<p class="desc">' + esc(cfg.score_hint || "") + '（以当年官方政策为准）</p>';
+  state.sections.grades.forEach((g) => {
+    const c = g.content;
+    const isCore = core.includes(c.semester);
+    h += '<div class="entry" data-grade="' + g.id + '"><div class="entry-head"><span class="t">' + esc(c.semester || "学期") +
+      (isCore ? ' <span class="star">★ 关键学期</span>' : "") + '</span>' +
+      '<button class="btn sm danger" data-del-section="' + g.id + '">删除</button></div>' +
+      '<label>学期</label><select data-f="semester">' +
+      (cfg.semesters || []).map((sm) => '<option' + (c.semester === sm ? " selected" : "") + ">" + sm + "</option>").join("") + "</select>" +
+      '<div class="row3"><div><label>语文</label><input data-f="chinese" value="' + esc(c.chinese) + '" placeholder="分数/等级"></div>' +
+      '<div><label>数学</label><input data-f="math" value="' + esc(c.math) + '"></div>' +
+      '<div><label>英语</label><input data-f="english" value="' + esc(c.english) + '"></div></div>' +
+      '<div class="row2"><div><label>三科总分</label><input data-f="total" value="' + esc(c.total) + '" placeholder="如 292"></div>' +
+      '<div><label>排名/等级说明</label><input data-f="level" value="' + esc(c.level) + '" placeholder="如 年级前10"></div></div>' +
+      '<label>备注</label><input data-f="remark" value="' + esc(c.remark) + '"></div>';
+  });
+  if (!state.sections.grades.length) h += '<p class="empty">还没有成绩记录，请添加核心学期（标 ★）成绩。</p>';
+  h += '<button class="btn add block" data-add="grades">+ 添加学期成绩</button></div>';
+  return h;
+}
+
+function awardCardHtml(a) {
+  const c = a.content;
+  const cups = state.student.city_config.cups || [];
+  let sel = '<label>快捷选择（本市竞赛字典）</label><select data-f="__cup"><option value="">其他赛事 / 手动填写</option>';
+  cups.forEach((cup) => {
+    sel += '<option value="' + esc(cup.short) + '"' + (c.cup_short === cup.short ? " selected" : "") + ">" + esc(cup.short) + "｜" + esc(cup.name) + (cup.tier ? "（" + cup.tier + "）" : "") + "</option>";
+  });
+  sel += "</select>";
+  return '<div class="entry" data-award="' + a.id + '"><div class="entry-head"><span class="t">' + esc(c.name || "获奖记录") +
+    (c.cup_tier ? '<span class="tier ' + esc(c.cup_tier) + '">' + esc(c.cup_tier) + "</span>" : "") + "</span>" +
+    '<button class="btn sm danger" data-del-section="' + a.id + '">删除</button></div>' +
+    sel +
+    '<label>赛事/荣誉全称</label><input data-f="name" value="' + esc(c.name) + '" placeholder="正式名称，如：华罗庚金杯少年数学邀请赛">' +
+    '<div class="row2"><div><label>科目</label><select data-f="subject">' +
+      ["", "数学", "英语", "科创", "信息学", "语文", "艺术", "体育", "综合"].map((s) => '<option value="' + s + '"' + (c.subject === s ? " selected" : "") + ">" + (s || "请选择") + "</option>").join("") + "</select></div>" +
+    '<div><label>主办方</label><input data-f="org" value="' + esc(c.org) + '"></div></div>' +
+    '<div class="row3"><div><label>级别</label><select data-f="level">' +
+      ["", "国家级", "省级", "市级", "区级", "校级"].map((s) => '<option value="' + s + '"' + (c.level === s ? " selected" : "") + ">" + (s || "请选择") + "</option>").join("") + "</select></div>" +
+    '<div><label>等级/名次</label><input data-f="rank" value="' + esc(c.rank) + '" placeholder="如 二等奖"></div>' +
+    '<div><label>获奖时间</label><input data-f="date" value="' + esc(c.date) + '" placeholder="如 2025-06"></div></div>' +
+    '<label>补充说明</label><input data-f="description" value="' + esc(c.description) + '" placeholder="如 决赛二等奖">' +
+    '<label>证书照片 / 文件</label>' + thumbsHtml(c.cert_images, "awards", a.id) + "</div>";
+}
+
+function awardsHtml() {
+  const jargon = state.student.city_config.jargon || [];
+  let h = '<div class="card"><h2><span class="n">4</span>获奖情况</h2>' +
+    '<p class="desc">从下拉框选择赛事可自动带出全称、科目与梯队；非竞赛荣誉（三好学生等）直接手动填写。' +
+    '<b>新功能：</b>上传证书照片后点「自动识别」可一键抽取字段，仅需核对。</p>' +
+    (state.sections.awards.length ? '<button class="btn sm" id="ocr-all-btn" style="margin-top:4px;color:var(--blue);border-color:var(--blue)">✨ 一键识别全部证书</button>' : '');
+  state.sections.awards.forEach((a) => { h += awardCardHtml(a); });
+  if (!state.sections.awards.length) h += '<p class="empty">还没有获奖记录。点击下方「+ 添加获奖记录」开始，或先上传证书照片让 AI 自动识别。</p>';
+  h += '<button class="btn add block" data-add="awards">+ 添加获奖记录</button>';
+  if (jargon.length) {
+    h += '<details class="jargon"><summary>圈内说法速查（仅帮助理解，简历中一律使用正式名称）</summary><table>' +
+      jargon.map((j) => "<tr><td>" + esc(j.term) + "</td><td>" + esc(j.meaning) + "</td></tr>").join("") + "</table></details>";
+  }
+  return h + "</div>";
+}
+
+function talentsHtml() {
+  let h = '<div class="card"><h2><span class="n">5</span>兴趣特长</h2>' +
+    '<p class="desc">考级证、段位证、等级考试证都可上传照片后点「自动识别」一键抽取字段，仅需核对。' +
+    '<b>坚持年限</b>多数证书上并不印，请家长据实补填。</p>' +
+    (state.sections.talents.length ? '<button class="btn sm" id="ocr-all-talent-btn" style="margin-top:4px;color:var(--blue);border-color:var(--blue)">✨ 一键识别全部特长证书</button>' : '');
+  state.sections.talents.forEach((t) => {
+    const c = t.content;
+    h += '<div class="entry" data-talent="' + t.id + '"><div class="entry-head"><span class="t">' + esc(c.title || "特长") + '</span>' +
+      '<button class="btn sm danger" data-del-section="' + t.id + '">删除</button></div>' +
+      '<div class="row2"><div><label>分类</label><select data-f="category">' +
+      ["科创", "艺术", "体育", "学科", "其他"].map((s) => '<option' + (c.category === s ? " selected" : "") + ">" + s + "</option>").join("") + "</select></div>" +
+      '<div><label>坚持年限</label><input data-f="years" value="' + esc(c.years) + '" placeholder="如 3"></div></div>' +
+      '<label>名称</label><input data-f="title" value="' + esc(c.title) + '" placeholder="如 编程与机器人">' +
+      '<label>描述</label><textarea data-f="description" placeholder="学习了什么、达到什么水平、有哪些成果…">' + esc(c.description) + "</textarea>" +
+      '<label>证书 / 证明图片</label>' + thumbsHtml(c.cert_images, "talents", t.id) + "</div>";
+  });
+  if (!state.sections.talents.length) h += '<p class="empty">还没有特长记录。</p>';
+  h += '<button class="btn add block" data-add="talents">+ 添加兴趣特长</button></div>';
+  return h;
+}
+
+function worksHtml() {
+  let h = '<div class="card"><h2><span class="n">6</span>成长作品</h2>' +
+    '<p class="desc">科创作品、研究性学习成果等，是简历里最有个性的部分。' +
+    '<b>新功能：</b>上传作品照片后点「✨ AI 看图说话」，AI 会<b>客观</b>描述画面里看得见的内容，' +
+    '帮你起个头——但获奖、名次、机构、时间它判断不了，请务必自行补充。</p>' +
+    (state.sections.works.length ? '<button class="btn sm" id="ocr-all-work-btn" style="margin-top:4px;color:var(--blue);border-color:var(--blue)">✨ 一键为全部作品看图说话</button>' : '');
+  state.sections.works.forEach((w) => {
+    const c = w.content;
+    h += '<div class="entry" data-work="' + w.id + '"><div class="entry-head"><span class="t">' + esc(c.title || "作品") + '</span>' +
+      '<button class="btn sm danger" data-del-section="' + w.id + '">删除</button></div>' +
+      '<label>作品名称</label><input data-f="title" value="' + esc(c.title) + '" placeholder="如 智能浇花器">' +
+      '<label>作品介绍</label><textarea data-f="description" placeholder="解决了什么问题、用了什么技术、孩子负责的部分…">' + esc(c.description) + "</textarea>" +
+      '<label>作品链接（选填）</label><input data-f="link" value="' + esc(c.link) + '" placeholder="https://…">' +
+      '<label>作品图片</label>' + thumbsHtml(c.images, "works", w.id) + "</div>";
+  });
+  if (!state.sections.works.length) h += '<p class="empty">还没有作品。</p>';
+  h += '<button class="btn add block" data-add="works">+ 添加成长作品</button></div>';
+  return h;
+}
+
+function essayHtml() {
+  const em = state.student.essay_material || {};
+  const fields = [
+    ["personality", "孩子性格", "如：内向但做事专注，喜欢钻研…"],
+    ["study_habits", "学习习惯", "如：每天放学先完成作业再玩，错题会整理到错题本…"],
+    ["interests", "兴趣爱好", "如：喜欢机器人搭建，自学了 Python…"],
+    ["highlights", "最想让老师知道的 3 个闪光点", "如：1. 坚持三年编程…"],
+  ];
+  let h = '<div class="card"><h2><span class="n">7</span>自荐信素材</h2>' +
+    '<p class="desc">请用大白话描述即可，AI 会帮孩子组织成正式自荐信。</p>';
+  fields.forEach(([k, label, ph]) => {
+    h += "<label>" + label + '</label><textarea data-essay="' + k + '" placeholder="' + ph + '">' + esc(em[k]) + "</textarea>";
+  });
+  return h + "</div>";
+}
+
+function familyNoteHtml() {
+  return '<div class="card"><h2><span class="n">8</span>家长寄语</h2>' +
+    '<textarea data-family-note placeholder="想对学校老师说的话…">' + esc(state.student.family_note) + "</textarea></div>";
+}
+
+function targetSchoolsHtml() {
+  let h = '<div class="card"><h2><span class="n">9</span>目标学校</h2>';
+  state.sections.target_schools.forEach((t) => {
+    const c = t.content;
+    h += '<div class="entry" data-ts="' + t.id + '"><div class="entry-head"><span class="t">' + esc(c.name || "目标学校") + '</span>' +
+      '<button class="btn sm danger" data-del-section="' + t.id + '">删除</button></div>' +
+      '<label>学校名称</label><input data-f="name" value="' + esc(c.name) + '" placeholder="正式校名">' +
+      '<label>择校理由</label><textarea data-f="reason" placeholder="为什么适合孩子…">' + esc(c.reason) + "</textarea></div>";
+  });
+  if (!state.sections.target_schools.length) h += '<p class="empty">还没有目标学校。</p>';
+  h += '<button class="btn add block" data-add="target_schools">+ 添加目标学校</button></div>';
+  return h;
+}
+
+function templatesHtml() {
+  const cur = state.student.template_id || "classic-blue";
+  let h = '<div class="card"><h2><span class="n">10</span>简历模板</h2>' +
+    '<p class="desc">点击卡片选用喜欢的样式；点缩略图可放大预览。更换模板后简历将自动重新生成。</p><div class="tpl-grid">';
+  (state.templates || []).forEach((t) => {
+    const active = t.id === cur;
+    h += '<div class="tpl-card' + (active ? " active" : "") + '" data-tpl="' + t.id + '">' +
+      '<div class="tpl-thumb"><img src="' + t.preview_img + '" alt="' + esc(t.name) + '预览" loading="lazy" data-zoom="' + t.preview_img + '"></div>' +
+      '<div class="tpl-info"><div class="tpl-name">' + esc(t.name) +
+      (active ? ' <span class="tpl-badge">当前使用</span>' : "") + '</div>' +
+      '<div class="tpl-desc">' + esc(t.desc) + '</div>' +
+      '<a class="tpl-sample" href="' + t.sample_pdf + '" target="_blank" rel="noopener" data-noselect>查看完整示例 PDF</a></div></div>';
+  });
+  return h + "</div></div>";
+}
+
+function submitHtml() {
+  const submitted = state.student.status !== "collecting";
+  const dirty = state.student.unsubmitted_changes;
+  const label = !submitted
+    ? "提交材料"
+    : dirty
+      ? "提交材料（生成新版本简历）"
+      : "已提交 · 再次确认提交";
+  return '<div class="submit-zone"><button class="btn primary block" id="submit-btn" style="font-size:16px">' +
+    label + "</button>" +
+    '<p class="hint" style="text-align:center;margin-top:8px">所有填写内容与上传的文件都会<b>实时自动保存</b>，随时可以关闭页面；' +
+    "点击上方按钮后，老师才会为孩子生成 / 更新简历版本。必填：孩子姓名、毕业小学、至少一个联系电话</p></div>";
+}
+
+function resumesHtml() {
+  let h = '<div class="card"><h2><span class="n">11</span>我的简历</h2>';
+  if (!state.resumes.length) {
+    h += '<p class="empty">简历还没有生成。提交材料后老师会为您生成 PDF 简历，<b>经老师审核通过后</b>会显示在这里。</p></div>';
+    return h;
+  }
+  state.resumes.forEach((r) => {
+    h += '<div class="resume-item"><div class="meta"><div class="v">' + esc(r.file_name) +
+      (r.is_latest ? ' <span class="latest">最新</span>' : "") + '</div>' +
+      '<div class="t">材料版本 v' + r.material_version + " · " + new Date(r.created_at).toLocaleString("zh-CN", { hour12: false }) +
+      (r.note ? " · " + esc(r.note) : "") + "</div></div>" +
+      '<button class="btn sm" data-view-pdf="' + r.id + '">查看</button>' +
+      '<a class="btn sm" href="/api/me/resumes/' + r.id + TQ + '" target="_blank" rel="noopener">新窗口打开</a></div>';
+  });
+  h += '<div id="pdf-box"></div></div>';
+  return h;
+}
+
+/* ---------- 主渲染 ---------- */
+function render() {
+  const s = state.student;
+  $("#stu-name").textContent = s.name || "小升初简历材料";
+  const badge = $("#status-badge");
+  badge.textContent = s.needs_regen ? "材料已更新" : STATUS_TEXT[s.status] || s.status;
+  badge.className = "badge " + (s.needs_regen ? "exported" : s.status);
+  $("#ver").textContent = "材料版本 v" + s.material_version;
+  renderBanners();
+  $("#main").innerHTML =
+    basicHtml() + contactsHtml() + gradesHtml() + awardsHtml() + talentsHtml() +
+    worksHtml() + essayHtml() + familyNoteHtml() + targetSchoolsHtml() + templatesHtml() + submitHtml() + resumesHtml();
+  renderSide();
+  bindEvents();
+}
+
+/* ---------- 事件绑定 ---------- */
+function collectEntryFields(entryEl) {
+  const obj = {};
+  $$("[data-f]", entryEl).forEach((inp) => {
+    if (inp.dataset.f.startsWith("__")) return;
+    obj[inp.dataset.f] = inp.value;
+  });
+  return obj;
+}
+
+function bindEvents() {
+  // 基本信息：分字段自动保存
+  $$("[data-basic]").forEach((inp) => {
+    inp.addEventListener("input", () => {
+      autoSave("basic", () => api("/api/me/basic", { method: "PUT", json: { basic: { [inp.dataset.basic]: inp.value } } }));
+    });
+  });
+  // 自荐信素材 / 家长寄语
+  $$("[data-essay]").forEach((ta) => {
+    ta.addEventListener("input", () => {
+      autoSave("essay", () => api("/api/me/basic", { method: "PUT", json: { essay_material: { [ta.dataset.essay]: ta.value } } }));
+    });
+  });
+  const fn = $("[data-family-note]");
+  if (fn) fn.addEventListener("input", () => {
+    autoSave("family_note", () => api("/api/me/basic", { method: "PUT", json: { family_note: fn.value } }));
+  });
+
+  // 头像上传
+  const photoBtn = $("#photo-btn"), photoInput = $("#photo-input");
+  if (photoBtn) photoBtn.onclick = () => photoInput.click();
+  if (photoInput) photoInput.onchange = async () => {
+    const f = photoInput.files && photoInput.files[0];
+    if (!f) return;
+    try {
+      saveHint("上传中…", "saving");
+      // v1.7: 证件照档（长边 1600px，印刷约 2 寸足够，留裁切余量）
+      const up = await maybeCompressImage(f, { maxEdge: 1600, quality: 0.85 });
+      if (up !== f) saveHint("图片已压缩 " + (f.size / 1048576).toFixed(1) + "MB → " + (up.size / 1048576).toFixed(1) + "MB，上传中…", "saving");
+      const att = await uploadFile(up, "basic", null, (p) => saveHint("上传中 " + p + "%", "saving"));
+      await api("/api/me/basic", { method: "PUT", json: { basic: { photo: att.id } } });
+      await load(true);
+    } catch (e) { alert("照片上传失败：" + e.message); saveHint("保存失败", "err"); }
+  };
+
+  // 条目字段编辑（blur/change 即保存）
+  const entrySel = "[data-contact],[data-grade],[data-award],[data-talent],[data-work],[data-ts]";
+  $$(entrySel).forEach((entry) => {
+    $$("[data-f]", entry).forEach((inp) => {
+      inp._v0 = inp.value; // 进入时的值，用于 blur 脏检查
+      inp.addEventListener("focus", () => { inp._v0 = inp.value; });
+      const evt = inp.tagName === "SELECT" ? "change" : "blur";
+      inp.addEventListener(evt, async () => {
+        if (inp.value === inp._v0) return; // 无变化不保存，避免虚抬材料版本
+        inp._v0 = inp.value;
+        const content = collectEntryFields(entry);
+        try {
+          saveHint("保存中…", "saving");
+          if (entry.dataset.contact) {
+            await api("/api/me/contacts/" + entry.dataset.contact, { method: "PUT", json: content });
+          } else {
+            const id = entry.dataset.grade || entry.dataset.award || entry.dataset.talent || entry.dataset.work || entry.dataset.ts;
+            // 取回原有附件引用，避免被覆盖
+            const cur = findSection(id);
+            if (cur) {
+              if (Array.isArray(cur.content.cert_images)) content.cert_images = cur.content.cert_images.map((a) => a.id);
+              if (Array.isArray(cur.content.images)) content.images = cur.content.images.map((a) => a.id);
+            }
+            await api("/api/me/sections/" + id, { method: "PUT", json: { content } });
+          }
+          saveHint("已自动保存");
+          if (inp.tagName === "SELECT") load(true); // 下拉变化可能改标题/梯队，重渲染
+        } catch (e) {
+          saveHint("保存失败", "err");
+          const id = entry.dataset.contact || entry.dataset.grade || entry.dataset.award || entry.dataset.talent || entry.dataset.work || entry.dataset.ts;
+          const isContact = !!entry.dataset.contact;
+          pushPending({ path: (isContact ? "/api/me/contacts/" : "/api/me/sections/") + id, method: "PUT", body: isContact ? content : { content } });
+        }
+      });
+    });
+  });
+
+  // 竞赛字典快捷选择
+  $$("[data-award] [data-f='__cup']").forEach((sel) => {
+    sel.addEventListener("change", async () => {
+      const entry = sel.closest("[data-award]");
+      const id = entry.dataset.award;
+      const cup = (state.student.city_config.cups || []).find((x) => x.short === sel.value);
+      const cur = findSection(id);
+      if (!cur) return;
+      const content = Object.assign({}, cur.content);
+      if (Array.isArray(content.cert_images)) content.cert_images = content.cert_images.map((a) => a.id);
+      if (cup) {
+        content.cup_short = cup.short;
+        content.name = cup.name;
+        content.subject = cup.subject;
+        content.cup_tier = cup.tier || "";
+      } else {
+        content.cup_short = "";
+        content.cup_tier = "";
+      }
+      try { await api("/api/me/sections/" + id, { method: "PUT", json: { content } }); await load(true); }
+      catch (e) { alert("保存失败：" + e.message); }
+    });
+  });
+
+  // 模板选择：点卡片选用，点缩略图放大
+  // v1.4.1: 加 in-flight 锁 + AbortController + 网络失败重试 1 次
+  // 修「连点模板触发 ERR_CONNECTION_CLOSED / race condition」：
+  //   旧 handler 每次 render() 都会重新绑，但旧 in-flight 请求未被取消；
+  //   load(true) 替换 main 时旧 fetch 被浏览器中止 → ERR_CONNECTION_CLOSED
+  let tplInFlight = null; // AbortController | null
+  $$(".tpl-card").forEach((card) => {
+    card.addEventListener("click", async (e) => {
+      if (e.target.closest("[data-noselect]")) return;
+      const zoomImg = e.target.closest("[data-zoom]");
+      if (zoomImg) {
+        // v1.6: 统一走放大查看器（带关闭按钮 / 原图模式）
+        openLightbox([{ url: zoomImg.dataset.zoom, name: zoomImg.dataset.zoomName || "模板预览", mime_type: "image/png" }], 0);
+        return;
+      }
+      const id = card.dataset.tpl;
+      if (id === state.student.template_id) return;
+      // 已有 in-flight：取消旧的，吞掉旧请求的异常避免 noise
+      if (tplInFlight) {
+        try { tplInFlight.abort(); } catch (_) {}
+        tplInFlight = null;
+      }
+      // 视觉反馈：禁用所有模板卡，避免误以为没响应而连点
+      $$(".tpl-card").forEach((c) => { c.style.pointerEvents = "none"; c.style.opacity = "0.6"; });
+      card.style.opacity = "1";
+      const oldHtml = card.querySelector(".tpl-info").innerHTML;
+      card.querySelector(".tpl-info").insertAdjacentHTML("afterbegin",
+        '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.7);border-radius:12px"><span class="spin" style="color:var(--blue)"></span>&nbsp;保存中…</div>');
+      saveHint("保存中…", "saving");
+
+      const ctrl = new AbortController();
+      tplInFlight = ctrl;
+      const attempt = async () => api("/api/me/basic", {
+        method: "PUT",
+        json: { template_id: id },
+        signal: ctrl.signal,
+      });
+      try {
+        try { await attempt(); }
+        catch (err) {
+          // AbortError 是我们主动取消的，向上抛让外层知道
+          if (err.name === "AbortError") throw err;
+          // 其他网络错误（含 ERR_CONNECTION_CLOSED / 5xx）→ 重试 1 次
+          await new Promise((r) => setTimeout(r, 400));
+          await attempt();
+        }
+        saveHint("已保存，提交后简历将按新模板生成");
+        await load(true);
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          alert("模板保存失败：" + err.message + "\n\n请检查网络后重试。");
+          saveHint("保存失败", "err");
+        }
+      } finally {
+        if (tplInFlight === ctrl) tplInFlight = null;
+        // 恢复所有卡片可点（render() 会重新生成 DOM，所以这里只是兜底）
+        $$(".tpl-card").forEach((c) => { c.style.pointerEvents = ""; c.style.opacity = ""; });
+        const ov = card.querySelector(".tpl-info > div:first-child");
+        if (ov && ov.querySelector(".spin")) ov.remove();
+      }
+    });
+  });
+
+  // 添加条目
+  $$("[data-add]").forEach((btn) => {
+    btn.onclick = async () => {
+      const type = btn.dataset.add;
+      btn.disabled = true;
+      try {
+        if (type === "contact") {
+          await api("/api/me/contacts", { json: { relation: "父亲" } });
+        } else {
+          const defaults = {
+            grades: { semester: firstUnusedSemester(), chinese: "", math: "", english: "", total: "", level: "", remark: "" },
+            awards: { name: "", cup_short: "", cup_tier: "", subject: "", org: "", level: "", rank: "", date: "", description: "", cert_images: [] },
+            talents: { category: "科创", title: "", description: "", years: "", cert_images: [] },
+            works: { title: "", description: "", images: [], link: "" },
+            target_schools: { name: "", reason: "" },
+          };
+          await api("/api/me/sections", { json: { type, content: defaults[type] } });
+        }
+        await load(true);
+      } catch (e) { alert("添加失败：" + e.message); btn.disabled = false; }
+    };
+  });
+
+  // 删除
+  $$("[data-del-contact]").forEach((b) => b.onclick = async () => {
+    if (!confirm("确定删除这位家庭成员？")) return;
+    try { await api("/api/me/contacts/" + b.dataset.delContact, { method: "DELETE" }); await load(true); }
+    catch (e) { alert("删除失败：" + e.message); }
+  });
+  $$("[data-del-section]").forEach((b) => b.onclick = async () => {
+    if (!confirm("确定删除该条目？关联的证书图片会一并删除。")) return;
+    try { await api("/api/me/sections/" + b.dataset.delSection, { method: "DELETE" }); await load(true); }
+    catch (e) { alert("删除失败：" + e.message); }
+  });
+  $$("[data-del-att]").forEach((b) => b.onclick = async () => {
+    if (!confirm("确定删除这个附件？")) return;
+    try { await api("/api/me/attachments/" + b.dataset.delAtt, { method: "DELETE" }); await load(true); }
+    catch (e) { alert("删除失败：" + e.message); }
+  });
+
+  // v1.6: 点击缩略图 → 放大查看（同一组的图片可左右翻页）
+  // 删除按钮在 .del 上，点它时不触发放大（先 closest 判断）
+  $$(".thumb[data-att]").forEach((t) => {
+    t.onclick = (e) => {
+      if (e.target.closest("[data-del-att]")) return;
+      const box = t.closest(".thumbs");
+      const items = $$(".thumb[data-att]", box).map((x) => ({
+        id: x.dataset.att, name: x.dataset.attName, mime_type: x.dataset.attMime,
+      }));
+      const idx = items.findIndex((x) => x.id === t.dataset.att);
+      openLightbox(items, idx < 0 ? 0 : idx);
+    };
+  });
+  // 证件照（不在 .thumbs 里，单独绑）
+  $$(".photo-circle[data-att]").forEach((p) => {
+    p.style.cursor = "zoom-in";
+    p.onclick = () => openLightbox([{ id: p.dataset.att, name: p.dataset.attName, mime_type: p.dataset.attMime }], 0);
+  });
+
+  // 上传触发
+  $$("[data-upload]").forEach((box) => {
+    box.onclick = () => {
+      const input = $(`input[data-file-for="${box.dataset.upload}|${box.dataset.item}"]`);
+      if (input) input.click();
+    };
+  });
+  $$("input[data-file-for]").forEach((input) => {
+    input.onchange = () => handleUpload(input);
+  });
+
+  // v1.5: 单张识别（awards / talents / works 通用）
+  $$("[data-vision]").forEach((btn) => {
+    btn.onclick = async () => {
+      const vk = btn.dataset.vision || "award";
+      const vkCfg = VISION_KINDS[vk] || VISION_KINDS.award;
+      const itemId = btn.dataset.item;
+      const ref = vkCfg.refField; // awards/talents → cert_images，works → images
+      const cur = findSection(itemId);
+      const img = (cur && cur.content[ref] || []).find((a) => (a.mime_type || "").startsWith("image/"));
+      if (!img) {
+        alert(vkCfg.emptyTip);
+        return;
+      }
+      btn.disabled = true;
+      const oldHtml = btn.innerHTML;
+      btn.innerHTML = '<span class="spin"></span> 识别中…';
+      showOcrLoading(vkCfg.loading);
+      try {
+        const data = await callVision(vk, img.id);
+        hideOcrLoading();
+        openOcrModal({
+          kind: vk,
+          attachment_id: img.id,
+          image_url: img.url,
+          ocr: data,
+          onConfirm: async (fields) => {
+            const fresh = findSection(itemId);
+            if (!fresh && !cur) throw new Error("找不到对应条目（itemId=" + itemId + "），可能已被删除。");
+            const content = Object.assign({}, (fresh || cur).content, fields);
+            if (Array.isArray(content[ref])) content[ref] = content[ref].map((a) => a.id);
+            await api("/api/me/sections/" + itemId, { method: "PUT", json: { content } });
+            await load(true);
+          },
+        });
+      } catch (e) {
+        hideOcrLoading();
+        alert("识别失败：" + e.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = oldHtml;
+      }
+    };
+  });
+
+  // v1.5: 一键识别全部（获奖 / 特长 / 作品 三个板块各一个按钮）
+  const OCR_ALL_SPECS = [
+    { id: "ocr-all-btn", kind: "award", list: () => state.sections.awards, nameOf: (c) => c.name || "获奖记录" },
+    { id: "ocr-all-talent-btn", kind: "talent", list: () => state.sections.talents, nameOf: (c) => c.title || "特长记录" },
+    { id: "ocr-all-work-btn", kind: "work", list: () => state.sections.works, nameOf: (c) => c.title || "作品" },
+  ];
+  for (const spec of OCR_ALL_SPECS) {
+    const btnAll = $("#" + spec.id);
+    if (!btnAll) continue;
+    const vkCfg = VISION_KINDS[spec.kind];
+    btnAll.onclick = async () => {
+      // 收集该板块所有条目下的图片附件（去重）
+      const seen = new Set();
+      const tasks = [];
+      for (const a of spec.list() || []) {
+        for (const img of (a.content[vkCfg.refField] || [])) {
+          if (!seen.has(img.id) && (img.mime_type || "").startsWith("image/")) {
+            seen.add(img.id);
+            tasks.push({ attachment_id: img.id, image_url: img.url, owner_id: a.id, owner_name: spec.nameOf(a.content) });
+          }
+        }
+      }
+      if (!tasks.length) {
+        alert("还没有上传图片。请先在卡片下上传图片。");
+        return;
+      }
+      const verb = spec.kind === "work" ? "看图说话" : "识别";
+      if (!confirm("将依次" + verb + " " + tasks.length + " 张图片，每张约 5–10 秒。完成后您需要逐张核对导入。\n\n确认开始？")) return;
+      btnAll.disabled = true;
+      const oldHtml = btnAll.innerHTML;
+      let done = 0;
+      for (const t of tasks) {
+        done++;
+        btnAll.innerHTML = '<span class="spin"></span> 识别中 ' + done + "/" + tasks.length + "…";
+        showOcrLoading("AI 正在处理第 " + done + " / " + tasks.length + " 张…");
+        try {
+          const data = await callVision(spec.kind, t.attachment_id);
+          hideOcrLoading();
+          // 串行弹窗（家长处理完一张再弹下一张）；取消/仅添加图片也算完成本张
+          await new Promise((resolve) => {
+            openOcrModal({
+              kind: spec.kind,
+              attachment_id: t.attachment_id,
+              image_url: t.image_url,
+              ocr: data,
+              onConfirm: async (fields) => {
+                const cur = findSection(t.owner_id);
+                if (cur) {
+                  const content = Object.assign({}, cur.content, fields);
+                  const ref = vkCfg.refField;
+                  if (Array.isArray(content[ref])) content[ref] = content[ref].map((a) => a.id);
+                  await api("/api/me/sections/" + t.owner_id, { method: "PUT", json: { content } });
+                  await load(true);
+                }
+                resolve();
+              },
+              onDismiss: () => resolve(),
+            });
+          });
+        } catch (e) {
+          hideOcrLoading();
+          if (!confirm("第 " + done + " 张识别失败：" + e.message + "\n是否继续识别下一张？")) break;
+        }
+      }
+      btnAll.disabled = false;
+      btnAll.innerHTML = oldHtml;
+    };
+  }
+
+  // 提交
+  $("#submit-btn").onclick = async () => {
+    const btn = $("#submit-btn");
+    btn.disabled = true;
+    try {
+      await api("/api/me/submit", { method: "POST" });
+      await load(true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (e) {
+      alert(e.message);
+      btn.disabled = false;
+    }
+  };
+
+  // 查看 PDF
+  $$("[data-view-pdf]").forEach((b) => b.onclick = () => {
+    $("#pdf-box").innerHTML = '<iframe class="pdf-frame" src="/api/me/resumes/' + b.dataset.viewPdf + TQ + '"></iframe>';
+    $("#pdf-box").scrollIntoView({ behavior: "smooth" });
+  });
+}
+
+function findSection(id) {
+  for (const t of ["grades", "awards", "talents", "works", "target_schools"]) {
+    const hit = state.sections[t].find((x) => x.id === id);
+    if (hit) return hit;
+  }
+  return null;
+}
+
+function firstUnusedSemester() {
+  const cfg = state.student.city_config;
+  const used = new Set(state.sections.grades.map((g) => g.content.semester));
+  const all = cfg.semesters || [];
+  const coreFirst = (cfg.core_semesters || []).concat(all.filter((s) => !(cfg.core_semesters || []).includes(s)));
+  return coreFirst.find((s) => !used.has(s)) || all[0] || "";
+}
+
+/* ---------- 加载 ---------- */
+async function load(keepScroll) {
+  const y = window.scrollY;
+  try {
+    state = await api("/api/me");
+  } catch (e) {
+    $("#main").innerHTML = '<div class="card"><p style="color:var(--red)">' + esc(e.message) + "</p>" +
+      '<p class="hint">请确认邀请链接完整无误；如链接失效请联系老师重新发送。</p></div>';
+    $("#side").innerHTML = "";
+    return;
+  }
+  render();
+  showNetErr();
+  if (keepScroll) window.scrollTo(0, y);
+}
+
+load();
+</script>
+</body>
+</html>
