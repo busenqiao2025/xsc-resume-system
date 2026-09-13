@@ -132,15 +132,18 @@ export function deriveConfidence(fields: OCRAwardFields, matched: CupItem | null
   return "low";
 }
 
-/** 构造 system prompt（注入城市 cups 字典） */
-export function buildSystemPrompt(cityName: string, cups: CupItem[]): string {
+/**
+ * 构造 system prompt（注入城市 cups 字典）
+ * sourceDesc：输入来源描述——图片识别用默认；v1.9 文档路径传「以下从证书文档（PDF/Word）中提取的文字」
+ */
+export function buildSystemPrompt(cityName: string, cups: CupItem[], sourceDesc = "证书图片"): string {
   const cupsList = cups.length
     ? cups.map((c) => `- ${c.short} → ${c.name}｜${c.subject}｜${c.tier}`).join("\n")
     : "（暂无）";
-  return `你是中国小升初简历助手，专注于识别获奖证书图片并抽取结构化字段。
+  return `你是中国小升初简历助手，专注于识别获奖证书${sourceDesc === "证书图片" ? "图片" : "文档"}并抽取结构化字段。
 
 # 任务
-读取证书图片，输出一个 JSON 对象（仅 JSON，无任何 markdown 代码块、注释、前后缀文字），字段如下：
+读取${sourceDesc}，输出一个 JSON 对象（仅 JSON，无任何 markdown 代码块、注释、前后缀文字），字段如下：
 - name: 赛事/荣誉全称（必须是家长圈公认的正式名称，不要用圈内黑话简称）
 - cup_short: 若属于下方"竞赛字典"中的赛事，填字典里的 short；否则留空字符串
 - cup_tier: 若属于字典中赛事，填字典里的 tier（T1/T2/T3/T4）；否则留空字符串
@@ -158,7 +161,7 @@ ${cupsList}
 # 输出要求
 1. 仅输出 JSON，不要任何解释、markdown 包裹
 2. 无法确定的字段留空字符串 ""，不要编造
-3. 若图片不是证书（如学生证、奖牌、合影），name 与其他字段都留空字符串
+3. 若${sourceDesc}不是证书（如学生证、奖牌、合影、与获奖无关的文档），name 与其他字段都留空字符串
 4. 字段优先级：name > cup_short > cup_tier > subject > org > level > rank > date > description`;
 }
 
@@ -565,6 +568,8 @@ export interface OcrEnv {
   EXTERNAL_OCR_API_KEY?: string;
   EXTERNAL_OCR_MODEL?: string;
   OCR_MODEL_ORDER?: string;
+  /** v1.9: 文档文字抽取用的文本模型顺序（逗号分隔完整 model id），缺省用内置免费档文本模型 */
+  OCR_TEXT_MODEL_ORDER?: string;
 }
 
 /** 端到端：bytes → 归一化结果 */
@@ -641,7 +646,8 @@ function normalizeYears(value: unknown): string {
   return "";
 }
 
-export function buildTalentSystemPrompt(): string {
+export function buildTalentSystemPrompt(sourceDesc = "证书图片"): string {
+  const isImg = sourceDesc === "证书图片";
   return `你是中国小升初简历助手，专注于识别「兴趣特长类证书」并抽取结构化字段。
 
 # 适用证书类型
@@ -650,7 +656,7 @@ export function buildTalentSystemPrompt(): string {
 运动员等级证、游泳/球类等级证、培训结业证、社团成员证等。
 
 # 任务
-读取证书图片，输出一个 JSON 对象（仅 JSON，无任何 markdown 代码块、注释、前后缀文字），字段如下：
+读取${sourceDesc}，输出一个 JSON 对象（仅 JSON，无任何 markdown 代码块、注释、前后缀文字），字段如下：
 - category: 科创|艺术|体育|学科|其他
   · 艺术 = 音乐/舞蹈/美术/书法/戏剧
   · 体育 = 球类/游泳/田径/棋类以外的体育项目
@@ -660,16 +666,16 @@ export function buildTalentSystemPrompt(): string {
   · 无法判断填「其他」
 - title: 特长名称本身，**不要**带级别和机构（如「钢琴」而不是「钢琴拾级证书」；
   「少儿编程」而不是「全国青少年编程等级考试」）。≤12 字。
-- description: 补充信息，用中文顿号或逗号分隔，只写证书上**确实印着**的内容，
+- description: 补充信息，用中文顿号或逗号分隔，只写证书上**确实${isImg ? "印着" : "写到"}**的内容，
   常见项：级别（拾级/八级/业余5段/三级）、颁证机构（中国音乐学院/中国舞蹈家协会）、
   成绩（优秀/良好/通过）。不要写「孩子很努力」这类评价。
-- years: 坚持年限，纯数字字符串（如「3」）。**只有证书上明确印着**"学习满X年"
+- years: 坚持年限，纯数字字符串（如「3」）。**只有证书上明确${isImg ? "印着" : "写到"}**"学习满X年"
   "连续学习X年"之类才填；绝大多数证书没有这一项，留空字符串 ""。
 
 # 输出要求
 1. 仅输出 JSON，不要任何解释、markdown 包裹
 2. 无法确定的字段留空字符串 ""，不要编造年限、级别、机构
-3. 若图片不是特长类证书（如学科竞赛奖状、三好学生奖状、学生证、普通合影），
+3. 若${sourceDesc}不是特长类证书（如学科竞赛奖状、三好学生奖状、学生证、普通合影），
    category 与 title 都留空字符串，并在 description 里说明这是什么
 4. title 只写项目名，级别放 description，两者不要重复`;
 }
@@ -898,4 +904,37 @@ export async function describeWork(
     hints,
     raw_text: text.slice(0, 2000),
   };
+}
+
+/* ============================================================================
+ * v1.9：成长作品「文档提取」（PDF/Word 作文、项目报告、作品说明书）
+ *
+ * 与看图说话同一套纪律：宁可平淡不可虚构，只写文档里确实有的信息。
+ * 输出契约与 OCRWorkFields 完全一致（title + description + hints）。
+ * ========================================================================== */
+export function buildWorkDocPrompt(): string {
+  return `你是中国小升初简历助手，负责从家长上传的「成长作品文档」中提取作品信息。
+
+文档可能是：孩子的作文、科创项目报告、作品说明书、小论文、实验记录等。
+这份内容最终会写进交给学校老师的简历，第一原则是：**只写文档里确实有的信息，不可虚构。**
+
+# 任务
+阅读文档文字，输出一个 JSON 对象（仅 JSON，无任何 markdown 代码块、注释、前后缀文字），字段如下：
+- title: 作品名称，≤20 字，客观命名，只写"是什么"，不写评价。
+  优先取文档自身的标题（如作文标题、报告标题）；没有标题就根据内容客观概括。
+- description: 作品介绍，2–4 句，说清三件事：
+  ① 这是一份什么文档/作品（一篇作文 / 一份科创项目报告 / 一份作品说明书）
+  ② 作品本身是什么（只写文档里明确描述的内容）
+  ③ 实现了什么或表达了什么（只写文档里明确说的，拿不准就用"看起来""似乎"）
+- hints: 字符串数组，0–3 条，提示家长还需要补充或核对什么。没有则给空数组 []。
+
+# 绝对禁止
+1. 禁止编造文档里没有的信息：获奖情况、名次、机构名、时间、人名、技术参数
+2. 禁止夸张修辞——"惊艳""天才""卓越""顶尖""小小发明家"等一律不得出现
+3. 禁止品质升华——"体现了创新精神"这类评价句不写
+4. 禁止第一人称转述时加料——文档没写的细节一律不补
+
+# 若文档与作品无关
+若文档是：获奖证书文字、成绩单、合同票据、或与任何作品无关的内容
+→ title 与 description 全部留空字符串，hints 写明「这份文档似乎不是作品材料，建议核对归属类别」。`;
 }

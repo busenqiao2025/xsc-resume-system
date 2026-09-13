@@ -185,6 +185,12 @@ details.jargon td:first-child{white-space:nowrap;font-weight:600;color:var(--tex
 .bf-meta{flex:1;min-width:0}
 .bf-name{font-size:13px;word-break:break-all;line-height:1.35}
 .bf-size{font-size:11px;color:var(--muted)}
+.bf-tag{display:inline-block;font-size:11px;padding:1px 7px;border-radius:99px;margin-top:3px;background:#eff6ff;color:var(--blue);border:1px solid #dbeafe}
+.bf-tag.doc{background:#fdf4ff;color:#a21caf;border-color:#f5d0fe}
+.bf-tag.attach{background:#f4f4f5;color:#71717a;border-color:#e4e4e7}
+.batch-legend{margin-top:10px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fafafa;font-size:12.5px;line-height:1.9;color:var(--text)}
+.batch-legend .lg-t{font-weight:700;font-size:13px;margin-bottom:2px}
+.batch-plan{margin-top:10px;font-size:12.5px;color:var(--muted);background:#fffbeb;border:1px dashed #fde68a;border-radius:8px;padding:7px 10px;line-height:1.6}
 .bf-st{font-size:12px;flex:none;max-width:48%;text-align:right;line-height:1.4}
 .st-run{color:var(--blue)}
 .st-done{color:var(--green)}
@@ -1028,11 +1034,11 @@ function awardsHtml() {
   const jargon = state.student.city_config.jargon || [];
   let h = '<div class="card" id="card-awards"><h2><span class="n">4</span>获奖情况</h2>' +
     '<p class="desc">从下拉框选择赛事可自动带出全称、科目与梯队；非竞赛荣誉（三好学生等）直接手动填写。' +
-    '<b>有多张证书？</b>推荐用「批量上传」，AI 会逐张识别并自动生成条目，无需一张张操作。</p>' +
+    '<b>有多张证书？</b>推荐用「批量上传」：证书照片 AI 看图识别，证书 PDF/Word AI 读取文字，都会自动生成条目，无需一张张操作。</p>' +
     '<button class="btn sm" data-batch-entry="awards" style="color:var(--orange);border-color:var(--orange)">📤 批量上传证书并 AI 生成</button> ' +
     (state.sections.awards.length ? '<button class="btn sm" id="ocr-all-btn" style="margin-top:4px;color:var(--blue);border-color:var(--blue)">✨ 一键识别全部证书</button>' : '');
   state.sections.awards.forEach((a) => { h += awardCardHtml(a); });
-  if (!state.sections.awards.length) h += '<p class="empty">还没有获奖记录。点击下方「+ 添加获奖记录」开始，或先上传证书照片让 AI 自动识别。</p>';
+  if (!state.sections.awards.length) h += '<p class="empty">还没有获奖记录。点击下方「+ 添加获奖记录」开始，或先上传证书照片/PDF 让 AI 自动识别。</p>';
   h += '<button class="btn add block" data-add="awards">+ 添加获奖记录</button>';
   if (jargon.length) {
     h += '<details class="jargon"><summary>圈内说法速查（仅帮助理解，简历中一律使用正式名称）</summary><table>' +
@@ -1043,7 +1049,7 @@ function awardsHtml() {
 
 function talentsHtml() {
   let h = '<div class="card" id="card-talents"><h2><span class="n">5</span>兴趣特长</h2>' +
-    '<p class="desc">考级证、段位证、等级考试证都可用「批量上传」一次传完，AI 逐张识别自动生成条目。' +
+    '<p class="desc">考级证、段位证、等级考试证都可用「批量上传」一次传完（照片/PDF/Word 均可），AI 逐个识别或读取文字，自动生成条目。' +
     '<b>坚持年限</b>多数证书上并不印，请家长据实补填。</p>' +
     '<button class="btn sm" data-batch-entry="talents" style="color:var(--orange);border-color:var(--orange)">📤 批量上传证书并 AI 生成</button> ' +
     (state.sections.talents.length ? '<button class="btn sm" id="ocr-all-talent-btn" style="margin-top:4px;color:var(--blue);border-color:var(--blue)">✨ 一键识别全部特长证书</button>' : '');
@@ -1066,9 +1072,9 @@ function talentsHtml() {
 function worksHtml() {
   let h = '<div class="card" id="card-works"><h2><span class="n">6</span>成长作品</h2>' +
     '<p class="desc">科创作品、研究性学习成果等，是简历里最有个性的部分。' +
-    '用「批量上传」一次传完作品照片，AI 会<b>客观</b>描述画面里看得见的内容并自动生成条目，' +
+    '用「批量上传」一次传完：作品照片 AI 会<b>客观</b>描述画面里看得见的内容，作文/项目报告等 PDF/Word 文档 AI 会读取文字提取要点，都会自动生成条目，' +
     '帮你起个头——但获奖、名次、机构、时间它判断不了，请务必自行补充。</p>' +
-    '<button class="btn sm" data-batch-entry="works" style="color:var(--orange);border-color:var(--orange)">📤 批量上传作品照片并 AI 生成</button> ' +
+    '<button class="btn sm" data-batch-entry="works" style="color:var(--orange);border-color:var(--orange)">📤 批量上传作品材料并 AI 生成</button> ' +
     (state.sections.works.length ? '<button class="btn sm" id="ocr-all-work-btn" style="margin-top:4px;color:var(--blue);border-color:var(--blue)">✨ 一键为全部作品看图说话</button>' : '');
   state.sections.works.forEach((w) => {
     const c = w.content;
@@ -1173,9 +1179,9 @@ function resumesHtml() {
    2) 原来传一张图就自动识别一张（串行弹窗、又慢又打断） —— 现在一次多选全部传完，
       交给后台 /api/me/ocr/ingest 逐张分析并自动建条目，家长最后在对应板块统一核对。 */
 const BATCH_CATS = [
-  { key: "awards", kind: "award", icon: "🏆", label: "获奖情况", tip: "竞赛获奖、三好学生等证书" },
-  { key: "talents", kind: "talent", icon: "🎨", label: "兴趣特长", tip: "考级证、段位证、培训证书" },
-  { key: "works", kind: "work", icon: "🛠", label: "成长作品", tip: "科创、手工等作品照片" },
+  { key: "awards", kind: "award", icon: "🏆", label: "获奖情况", tip: "竞赛获奖、三好学生等证书（照片/扫描件/PDF）" },
+  { key: "talents", kind: "talent", icon: "🎨", label: "兴趣特长", tip: "考级证、段位证、培训证书（照片/PDF）" },
+  { key: "works", kind: "work", icon: "🛠", label: "成长作品", tip: "作品照片、作文、项目报告等" },
 ];
 /* batchSel 跨 render 存活：选的类别、待传文件、运行状态、上次结果 */
 let batchSel = { cat: null, files: [], running: false, results: null, resultsCat: null, summary: null };
@@ -1191,7 +1197,12 @@ function batchUploadHtml() {
 function batchUploadInner() {
   const running = batchSel.running;
   let h = '<h2><span class="n" style="background:var(--orange)">AI</span>批量上传佐证材料</h2>' +
-    '<p class="desc"><b>① 先选这批材料的归属</b> → <b>② 多选文件一次上传</b>（图片自动压缩）→ AI 逐张分析并<b>自动生成条目</b>，您只需到对应板块核对修改。一次最多 20 个文件。</p>';
+    '<p class="desc"><b>① 先选这批材料的归属</b> → <b>② 多选文件一次上传</b>（图片自动压缩）→ <b>③ AI 自动生成条目</b>，您只需到对应板块核对修改。一次最多 20 个文件。</p>';
+  // 小白向图例：三类文件分别怎么处理，上传前就说清楚
+  h += '<div class="batch-legend"><div class="lg-t">不同类型文件，AI 这样处理：</div>' +
+    '<div>📷 <b>图片</b>（JPG/PNG/WebP）→ AI 看图识别上面的文字</div>' +
+    '<div>📄 <b>PDF / Word 文档</b> → AI 读取文档内容提取要点（扫描件 PDF 没有文字，只会保存原件）</div>' +
+    '<div>🗂 <b>所有原件</b>都会作为附件保存在条目里，生成简历时可随时调取</div></div>';
   // ① 归属选择（上传前必答，杜绝「传到错的板块」）
   h += '<div class="cat-grid" id="cat-grid">' + BATCH_CATS.map((c) =>
     '<div class="cat-card' + (batchSel.cat === c.key ? " active" : "") + (running ? " locked" : "") + '" data-cat="' + c.key + '">' +
@@ -1199,11 +1210,12 @@ function batchUploadInner() {
   ).join("") + "</div>";
   // ② 选文件
   h += '<div class="batch-drop' + (running ? " locked" : "") + '" id="batch-drop">📁 点击选择文件（可多选）' +
-    '<p class="hint" style="margin:4px 0 0">支持 JPG/PNG/WebP 图片、PDF、Word；每张证书 / 作品一张图，识别效果最好</p></div>' +
+    '<p class="hint" style="margin:4px 0 0">支持 JPG/PNG/WebP 图片与 PDF、Word 文档；一张证书 / 一个作品对应一个文件，效果最好</p></div>' +
     '<input type="file" hidden multiple id="batch-input" accept="image/*,.pdf,.doc,.docx">';
-  // 待传文件列表 + 逐文件状态
+  // 待传文件列表 + 逐文件状态 + 处理预告
   if (batchSel.files.length) {
     h += '<div id="batch-files">' + batchSel.files.map((f, i) => batchFileRowHtml(f, i)).join("") + "</div>";
+    if (!running) h += batchPlanHtml();
   }
   // 上次处理结果（load 重渲染后仍保留，直到家长清空或再次选择文件）
   if (!running && batchSel.results && batchSel.results.length) {
@@ -1229,6 +1241,33 @@ function batchUploadInner() {
   return h;
 }
 
+/** 文件类型 → 展示标签 + 图标（上传前就让家长知道这份文件 AI 会怎么处理） */
+function batchFileTypeOf(file) {
+  const t = file.type || "";
+  if (t.startsWith("image/")) return { cls: "", tag: "图片 · AI 看图识别", ico: null };
+  if (t === "application/pdf") return { cls: " doc", tag: "PDF · AI 读取文字", ico: "📕" };
+  if (t.indexOf("word") >= 0 || t.indexOf("officedocument") >= 0 || /\.docx?$/i.test(file.name || "")) {
+    return { cls: " doc", tag: "Word · AI 读取文字", ico: "📝" };
+  }
+  return { cls: " attach", tag: "仅保存原件", ico: "📄" };
+}
+
+/** 选完文件后的处理预告（几类文件各几个，家长点「开始」前心里有数） */
+function batchPlanHtml() {
+  let imgs = 0, docs = 0, others = 0;
+  batchSel.files.forEach((f) => {
+    const t = batchFileTypeOf(f.file);
+    if (!t.ico) imgs++;
+    else if (t.cls === " doc") docs++;
+    else others++;
+  });
+  const parts = [];
+  if (imgs) parts.push("📷 " + imgs + " 张图片 → AI 看图识别");
+  if (docs) parts.push("📄 " + docs + " 个文档 → AI 读取文字提取要点");
+  if (others) parts.push("🗂 " + others + " 个其他文件 → 仅保存原件");
+  return '<div class="batch-plan">即将处理 ' + batchSel.files.length + " 个文件：" + parts.join("；") + "。原件都会保存为附件。</div>";
+}
+
 function batchFileRowHtml(f, i) {
   const st = f.status || "pending";
   const stHtml =
@@ -1237,10 +1276,11 @@ function batchFileRowHtml(f, i) {
     st === "done" ? '<span class="bf-st st-done">✅ ' + esc(f.msg || "已生成") + "</span>" :
     st === "warn" ? '<span class="bf-st st-warn">⚠️ ' + esc(f.msg || "需补填") + "</span>" :
     '<span class="bf-st st-fail">❌ ' + esc(f.msg || "失败") + "</span>";
-  const isImg = (f.file.type || "").startsWith("image/");
+  const ft = batchFileTypeOf(f.file);
   return '<div class="bf-row">' +
-    (isImg && f.url ? '<img class="bf-thumb" src="' + f.url + '" alt="">' : '<div class="bf-ico">📄</div>') +
-    '<div class="bf-meta"><div class="bf-name">' + esc(f.file.name) + '</div><div class="bf-size">' + (f.file.size / 1048576).toFixed(1) + " MB</div></div>" +
+    (!ft.ico && f.url ? '<img class="bf-thumb" src="' + f.url + '" alt="">' : '<div class="bf-ico">' + (ft.ico || "🖼") + "</div>") +
+    '<div class="bf-meta"><div class="bf-name">' + esc(f.file.name) + '</div>' +
+    '<div class="bf-size">' + (f.file.size / 1048576).toFixed(1) + ' MB <span class="bf-tag' + ft.cls + '">' + ft.tag + "</span></div></div>" +
     stHtml +
     (!batchSel.running && st === "pending" ? '<button class="bf-del" data-bf-del="' + i + '" title="移除">×</button>' : "") +
     "</div>";
@@ -1294,23 +1334,27 @@ async function runBatch() {
   batchSel.results = null;
   renderBatchArea();
 
-  // 1) 逐个压缩 + 上传（沿用 v1.7 压缩策略：长边 2560px q0.82，不改动压缩逻辑本身）
+  // 1) 逐个处理上传（图片走 v1.7 压缩策略：长边 2560px q0.82；文档不压缩、原样上传）
   const uploaded = [];
   for (let i = 0; i < batchSel.files.length; i++) {
     const f = batchSel.files[i];
+    const isImg = (f.file.type || "").startsWith("image/");
     try {
-      setBatchFileStatus(i, "run", "压缩中…");
-      const up = await maybeCompressImage(f.file, { maxEdge: 2560, quality: 0.82 });
+      let up = f.file;
+      if (isImg) {
+        setBatchFileStatus(i, "run", "压缩中…");
+        up = await maybeCompressImage(f.file, { maxEdge: 2560, quality: 0.82 });
+      }
       setBatchFileStatus(i, "run", "上传中…");
       const att = await uploadFile(up, cat.key, null, (p) => setBatchFileStatus(i, "run", "上传中 " + p + "%"));
       uploaded.push({ idx: i, att });
-      setBatchFileStatus(i, "run", "已上传，等待 AI 分析…");
+      setBatchFileStatus(i, "run", isImg ? "已上传，等待 AI 看图识别…" : "已上传，等待 AI 读取文档…");
     } catch (e) {
       setBatchFileStatus(i, "fail", e.message || "上传失败");
     }
   }
 
-  // 2) 全部传完后一次性交给后台：逐张 AI 分析 + 自动生成条目
+  // 2) 全部传完后一次性交给后台：图片逐张识别、文档逐个提取，自动生成条目
   if (uploaded.length) {
     try {
       const data = await api("/api/me/ocr/ingest", {
@@ -1321,14 +1365,15 @@ async function runBatch() {
         const r = byAtt.get(u.att.id);
         if (!r) { setBatchFileStatus(u.idx, "warn", "后台未处理该文件"); continue; }
         if (r.ok) {
-          setBatchFileStatus(u.idx, "done", "已生成「" + (r.title || cat.label) + "」" + (r.confidence === "low" ? "（置信度低，请重点核对）" : ""));
+          const verb = r.via === "doc_text" ? "已从文档提取" : "已识别生成";
+          setBatchFileStatus(u.idx, "done", verb + "「" + (r.title || cat.label) + "」" + (r.confidence === "low" ? "（把握不大，请重点核对）" : ""));
         } else {
-          setBatchFileStatus(u.idx, "warn", (r.section_id ? "已建条目，" : "") + (r.error || "AI 未识别") + "，请手动补填");
+          setBatchFileStatus(u.idx, "warn", (r.section_id ? "原件已保存：" : "") + (r.error || "AI 未识别"));
         }
       }
     } catch (e) {
       for (const u of uploaded) {
-        setBatchFileStatus(u.idx, "warn", "批量分析失败（" + e.message + "），图片已保存，可在条目中手动识别或填写");
+        setBatchFileStatus(u.idx, "warn", "批量分析失败（" + e.message + "），文件已保存，可在条目中手动填写");
       }
     }
   }

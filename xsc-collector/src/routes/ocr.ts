@@ -33,6 +33,7 @@ import {
   type OCRTalentResult,
   type OCRWorkResult,
 } from "../lib/ocr";
+import { isDocMime, extractDocText, extractFieldsFromDoc } from "../lib/doc-extract";
 
 type Vars = { student: StudentRow };
 type C = Context<{ Bindings: Env; Variables: Vars }>;
@@ -79,12 +80,12 @@ function rateCheck(studentId: string): boolean {
 }
 
 /** 从 attachments 表拉取附件（校验归属） */
-async function fetchOwnedAttachment(c: C, attachmentId: string): Promise<{ r2_key: string; mime_type: string; size: number } | null> {
+async function fetchOwnedAttachment(c: C, attachmentId: string): Promise<{ r2_key: string; mime_type: string; size: number; original_name: string } | null> {
   const row = await c.env.DB.prepare(
-    "SELECT r2_key, mime_type, size FROM attachments WHERE id = ? AND student_id = ?"
+    "SELECT r2_key, mime_type, size, original_name FROM attachments WHERE id = ? AND student_id = ?"
   )
     .bind(attachmentId, c.get("student").id)
-    .first<{ r2_key: string; mime_type: string; size: number }>();
+    .first<{ r2_key: string; mime_type: string; size: number; original_name: string }>();
   return row || null;
 }
 
@@ -218,6 +219,7 @@ function ocrEnvOf(c: C): OcrEnv {
     EXTERNAL_OCR_API_KEY: c.env.EXTERNAL_OCR_API_KEY,
     EXTERNAL_OCR_MODEL: c.env.EXTERNAL_OCR_MODEL,
     OCR_MODEL_ORDER: c.env.OCR_MODEL_ORDER,
+    OCR_TEXT_MODEL_ORDER: c.env.OCR_TEXT_MODEL_ORDER,
   };
 }
 
@@ -300,6 +302,86 @@ async function processVision(
   });
 
   return { source: result.provider === "workers_ai" ? "workers_ai" : "external", ...result };
+}
+
+/**
+ * v1.9: 文档处理（PDF/Word）——不做视觉识别。
+ * 流程与 processVision 对齐：缓存 → 取文件 → 提取文字 → 限流 → 文本 LLM → 写缓存。
+ * 差异：只有真正要调 LLM 前才占限流名额（提取不出文字的扫描件不消耗配额）。
+ * 返回 Response 表示失败（已构造好错误响应），调用方直接建「仅存原件」条目。
+ */
+async function processDoc(
+  c: C,
+  kind: OcrKind,
+  att: { r2_key: string; mime_type: string; size: number; original_name: string },
+  attachmentId: string
+): Promise<Record<string, unknown> | Response> {
+  const student = c.get("student");
+  if (att.size > MAX_ATTACHMENT_SIZE) {
+    return fail(c, 413, "PAYLOAD_TOO_LARGE", "附件超过 10MB 限制");
+  }
+
+  // 1. 查缓存（与图片同一套 ocr_cache，30 天内不重复提取）
+  const cached = await readCache(c.env.DB, attachmentId, kind);
+  if (cached) {
+    return {
+      source: "cache",
+      via: "doc_text",
+      provider: cached.provider,
+      model: cached.model,
+      duration_ms: 0,
+      confidence: cached.confidence,
+      fields: cached.fields,
+      matched_dict_entry: null,
+      raw_text: cached.raw_text,
+      hints: ["命中缓存（30 天内），如需重新提取请删除缓存"],
+    };
+  }
+
+  // 2. 取文件 → 提取纯文字（不调 LLM，不占限流）
+  const obj = await c.env.BUCKET.get(att.r2_key);
+  if (!obj) return fail(c, 404, "NOT_FOUND", "附件文件不存在");
+  const bytes = new Uint8Array(await obj.arrayBuffer());
+  const doc = await extractDocText(ocrEnvOf(c), bytes, att.mime_type, att.original_name || "");
+  if (!doc) {
+    const isPdf = att.mime_type === "application/pdf";
+    return fail(
+      c,
+      422,
+      "DOC_NO_TEXT",
+      isPdf
+        ? "这份 PDF 读不到文字（可能是扫描件/图片型 PDF），已保存原件，请手动填写或改传照片"
+        : "这份文档读不到文字（旧版 .doc 建议另存为 .docx 或 PDF 再传），已保存原件，请手动填写"
+    );
+  }
+
+  // 3. 限流（与图片识别同一个桶）
+  if (!rateCheck(student.id)) {
+    return fail(c, 429, "OCR_RATE_LIMIT", "识别太频繁，请稍后再试（每分钟 ≤ 10 次）");
+  }
+
+  // 4. 文本 LLM 抽取结构化字段
+  const cfg = getCityConfig(student.city);
+  let result;
+  try {
+    result = await extractFieldsFromDoc(ocrEnvOf(c), kind, { cityName: cfg.name, cups: cfg.cups }, doc, att.original_name || "");
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error(`[doc] ${kind} 文档提取失败：`, msg);
+    return fail(c, 502, "OCR_PROVIDER_DOWN", `AI 提取服务暂时不可用（${msg.slice(0, 160)}）。文件已保存，请稍后重试或手动填写。`);
+  }
+
+  // 5. 写缓存
+  await writeCache(c.env.DB, attachmentId, student.id, kind, {
+    fields: result.fields,
+    matched_short: result.matched_dict_entry?.short ?? null,
+    raw_text: result.raw_text,
+    confidence: result.confidence,
+    model: result.model,
+    provider: result.provider,
+  });
+
+  return { source: result.provider === "workers_ai" ? "workers_ai" : "external", via: "doc_text", ...result };
 }
 
 /** 解析请求里的图片：multipart(file + attachment_id) 或 JSON(attachment_id) */
@@ -430,18 +512,22 @@ registerKind("work", "work", "看图说话");
 
 /* ============================================================================
  * v1.8: POST /api/me/ocr/ingest — 批量材料「识别 + 自动建条目」一条龙
+ * v1.9: 按文件类型三路分流——
+ *   ① 图片（JPG/PNG/WebP）→ 视觉 OCR（processVision：缓存→限流→视觉模型）
+ *   ② PDF/Word → 文档提取（processDoc：toMarkdown 转文字→文本 LLM 抽字段）
+ *   ③ 提取不出文字（扫描件 PDF / 老 .doc）或未知类型 → 只保存原件，
+ *     建空字段条目（作品/特长用文件名做占位标题），家长手动补填
  *
  * 新上传流程（家长端批量上传卡片）：
  *   家长先选归属（获奖/特长/作品），多选文件逐个上传到 /api/me/attachments
  *  （此时附件 item_id 为空），最后把全部 attachment_id 交给本端点。
- *   本端点逐个识别（缓存 → 限流 → 模型，与单张端点同一套 processVision），
- *   然后按识别字段自动创建对应板块条目，并把附件绑定到新条目
- *  （UPDATE attachments.item_id + content.cert_images/images 引用）。
+ *   建条目后把附件绑定到新条目（UPDATE attachments.item_id + content.cert_images/images 引用）。
  *
  * 设计要点：
- *   - 单张失败不拖垮整批：识别失败/非图片也照常建「空字段 + 文件」条目，
+ *   - 单文件失败不拖垮整批：识别/提取失败也照常建「空字段 + 文件」条目，
  *     保住已上传材料，错误信息随 results 返回，家长手动补填即可；
- *   - 识别字段与 OCR*Fields 契约一致，直接展开即合法 section content；
+ *   - 两条 AI 路径输出契约一致（同一套 sanitize + 杯赛字典），直接展开即合法 section content；
+ *   - 每条结果带 via（image_ocr | doc_text），前端按通道区别展示；
  *   - 并发 3 路（与 /batch 一致），updated_at 只在最后统一 touch 一次。
  * ========================================================================== */
 
@@ -457,7 +543,7 @@ const INGEST_REF_OF: Record<OcrKind, "cert_images" | "images"> = {
   work: "images",
 };
 
-/** 识别失败/非图片时的兜底空字段（与前端「添加条目」默认值一致） */
+/** 识别失败/提取失败时的兜底空字段（与前端「添加条目」默认值一致） */
 function ingestEmptyFields(kind: OcrKind): Record<string, unknown> {
   if (kind === "award") {
     return { name: "", cup_short: "", cup_tier: "", subject: "", org: "", level: "", rank: "", date: "", description: "" };
@@ -466,6 +552,22 @@ function ingestEmptyFields(kind: OcrKind): Record<string, unknown> {
     return { category: "其他", title: "", description: "", years: "" };
   }
   return { title: "", description: "", link: "" };
+}
+
+/** 文件名去扩展名，作为「仅存原件」条目的占位标题（家长看到能认出是哪个文件） */
+function filenameStem(name: string): string {
+  return String(name || "").replace(/\.[a-zA-Z0-9]{1,8}$/, "").trim().slice(0, 40);
+}
+
+/** 从失败的 processDoc/processVision 响应里抠出给家长看的错误消息 */
+async function errMsgOf(r: Response, fallback: string): Promise<string> {
+  try {
+    const b = (await r.clone().json()) as { error?: { message?: string } };
+    if (b && b.error && b.error.message) return b.error.message;
+  } catch {
+    /* 忽略 */
+  }
+  return fallback;
 }
 
 /** 结果面板展示的条目标题 */
@@ -500,19 +602,27 @@ app.post("/ingest", async (c) => {
     section_id?: string;
     title?: string;
     confidence?: string;
+    /** 处理通道：image_ocr（图片识别）| doc_text（文档提取）；失败/仅存原件时缺省 */
+    via?: string;
     error?: string;
   }
   const results: IngestResult[] = [];
 
-  /** 建条目 + 绑定附件；fields 为 null 表示未识别（空字段兜底保住文件） */
+  /** 建条目 + 绑定附件；fields 为 null 表示未识别（空字段兜底保住文件，作品/特长用文件名占位标题） */
   async function createItem(
     aid: string,
     fields: Record<string, unknown> | null,
-    errMsg?: string
+    errMsg?: string,
+    fileName?: string
   ): Promise<IngestResult> {
     const content: Record<string, unknown> = { ...(fields || ingestEmptyFields(kind)) };
     // 特长分类为空 → 「其他」：前端下拉没有空选项，留空会在下次编辑时被误存成第一个选项
     if (kind === "talent" && !content.category) content.category = "其他";
+    // 作品/特长的标题兜底取文件名（stem），家长在结果面板能认出是哪个文件；奖项名不猜（防止编名进简历）
+    if (kind !== "award" && !content.title && fileName) {
+      const stem = filenameStem(fileName);
+      if (stem) content.title = stem;
+    }
     content[refField] = [aid];
     const sid = await uniqueId(c.env.DB, "sections", "s", 5);
     const now = new Date().toISOString();
@@ -534,39 +644,70 @@ app.post("/ingest", async (c) => {
     return base;
   }
 
+  /** 提取/识别成功但关键字段全空 → 降级为「已保存原件，请手动补填」 */
+  function fieldsEmpty(fields: Record<string, unknown>): boolean {
+    if (kind === "award") return !fields.name;
+    return !fields.title;
+  }
+
   const queue = [...ids];
   const worker = async () => {
     while (queue.length) {
       const aid = queue.shift()!;
       try {
-        const got = await fetchOwnedImage(c, aid);
-        if (!got) {
-          // 附件存在但非图片（PDF/Word）：建空条目保住文件；不存在则纯报错
-          const exists = await fetchOwnedAttachment(c, aid);
-          results.push(
-            exists
-              ? await createItem(aid, null, "非图片文件，AI 未识别")
-              : { ok: false, attachment_id: aid, error: "附件不存在" }
-          );
+        const att = await fetchOwnedAttachment(c, aid);
+        if (!att) {
+          results.push({ ok: false, attachment_id: aid, error: "附件不存在" });
           continue;
         }
-        const r = await processVision(c, kind, got.bytes, got.mime, aid, recognize);
-        if (r instanceof Response) {
-          let msg = "AI 识别失败";
-          try {
-            const b = (await r.clone().json()) as { error?: { message?: string } };
-            if (b && b.error && b.error.message) msg = b.error.message;
-          } catch {
-            /* 忽略 */
+
+        // ① 图片：视觉 OCR
+        if (att.mime_type.startsWith("image/") && ALLOWED_MIME.has(att.mime_type)) {
+          const got = await fetchOwnedImage(c, aid);
+          if (!got) {
+            results.push(await createItem(aid, null, "图片读取失败，原件已保存", att.original_name));
+            continue;
           }
-          results.push(await createItem(aid, null, msg));
-        } else {
-          const fields = (r as { fields?: Record<string, unknown> }).fields || null;
-          const item = await createItem(aid, fields);
-          const conf = (r as { confidence?: string }).confidence;
-          if (conf) item.confidence = conf;
-          results.push(item);
+          const r = await processVision(c, kind, got.bytes, got.mime, aid, recognize);
+          if (r instanceof Response) {
+            results.push(await createItem(aid, null, await errMsgOf(r, "AI 识别失败"), att.original_name));
+          } else {
+            const fields = (r as { fields?: Record<string, unknown> }).fields || null;
+            if (fields && fieldsEmpty(fields)) {
+              results.push(await createItem(aid, null, "AI 没能从这张图里认出有效内容，原件已保存，请手动填写", att.original_name));
+              continue;
+            }
+            const item = await createItem(aid, fields, undefined, att.original_name);
+            item.via = "image_ocr";
+            const conf = (r as { confidence?: string }).confidence;
+            if (conf) item.confidence = conf;
+            results.push(item);
+          }
+          continue;
         }
+
+        // ② PDF/Word：文档文字提取（不做视觉识别）
+        if (isDocMime(att.mime_type)) {
+          const r = await processDoc(c, kind, att, aid);
+          if (r instanceof Response) {
+            results.push(await createItem(aid, null, await errMsgOf(r, "文档提取失败"), att.original_name));
+          } else {
+            const fields = (r as { fields?: Record<string, unknown> }).fields || null;
+            if (fields && fieldsEmpty(fields)) {
+              results.push(await createItem(aid, null, "AI 读完文档但没能提取出有效信息，原件已保存，请手动填写", att.original_name));
+              continue;
+            }
+            const item = await createItem(aid, fields, undefined, att.original_name);
+            item.via = "doc_text";
+            const conf = (r as { confidence?: string }).confidence;
+            if (conf) item.confidence = conf;
+            results.push(item);
+          }
+          continue;
+        }
+
+        // ③ 其他类型：只保存原件（正常不会走到——上传入口已限定 mime）
+        results.push(await createItem(aid, null, "该文件类型仅保存原件，请手动填写内容", att.original_name));
       } catch (e) {
         results.push({
           ok: false,

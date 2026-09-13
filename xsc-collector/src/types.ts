@@ -156,4 +156,6 @@ export interface Env {
   EXTERNAL_OCR_MODEL?: string;
   // v1.4.2: 覆盖 Workers AI 视觉模型尝试顺序（逗号分隔完整 model id）
   OCR_MODEL_ORDER?: string;
+  // v1.9: 覆盖文档文字抽取的 Workers AI 文本模型顺序（逗号分隔完整 model id）
+  OCR_TEXT_MODEL_ORDER?: string;
 }
