@@ -135,6 +135,11 @@
     background: #ffffff;
   }
   .award-item:last-child { margin-bottom: 0; }
+  /* 奖项多（>=4）时双列排布，压缩垂直空间；顺序按列先左后右 */
+  .award-list.cols-2 { columns: 2; column-gap: 12px; }
+  .award-list.cols-2 .award-item { break-inside: avoid; }
+  .award-list.cols-2 .cert { width: 148px; }
+  .award-list.cols-2 .cert img { height: 104px; }
   .award-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
   .award-name { font-size: 15px; font-weight: 700; color: var(--ink); }
   .award-date { font-size: 12.5px; color: var(--muted); white-space: nowrap; }
@@ -223,19 +228,6 @@
     display: block;
   }
   .work-link { font-size: 12.5px; color: var(--primary); word-break: break-all; }
-
-  /* ---------- 页脚 ---------- */
-  .doc-footer {
-    margin-top: 36px;
-    padding-top: 16px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: var(--muted);
-    font-size: 12px;
-  }
-  .doc-footer .brand { font-weight: 600; color: var(--primary); letter-spacing: 1px; }
 </style>
 </head>
 <body>
@@ -311,6 +303,7 @@
   {% if p.awards %}
   <section>
     <div class="sec-title"><span class="bar"></span><span class="text">获奖与荣誉</span><span class="rule"></span></div>
+    <div class="award-list{% if p.awards | length >= 4 %} cols-2{% endif %}">
     {% for a in p.awards %}
     <div class="award-item">
       <div class="award-head">
@@ -333,6 +326,7 @@
       {% endif %}
     </div>
     {% endfor %}
+    </div>
   </section>
   {% endif %}
 
@@ -383,12 +377,6 @@
   {% endif %}
 
   {# 目标学校与家长寄语属内部数据（给工作人员参考/写作用），绝不渲染到简历 #}
-
-  <footer class="doc-footer">
-    <span class="brand">SPARKMINDS</span>
-    <span>{{ p.name }} · 小升初简历</span>
-    <span>材料版本 v{{ p.meta.material_version if p.meta else 1 }}</span>
-  </footer>
 
 </div>
 </body>

@@ -63,6 +63,27 @@ def normalize(profile: dict):
     profile["awards"] = awards
 
 
+GENERIC_NAMES = {"奖状", "证书", "获奖证书", "荣誉证书", "奖励证书"}
+
+
+def find_incomplete(profile: dict) -> list:
+    """「有图无字」的获奖/特长条目清单——2a 附件核对补全的自检兜底。
+    名称为空/笼统必报；带证书图片但 level/rank/date/org 缺 3 项以上的视为漏录。"""
+    issues = []
+    for i, a in enumerate(profile.get("awards") or []):
+        name = str(a.get("name") or "").strip()
+        missing = [k for k in ("level", "rank", "date", "org") if not str(a.get(k) or "").strip()]
+        if not name or name in GENERIC_NAMES:
+            issues.append({"type": "award", "index": i, "name": name, "missing": ["name"] + missing})
+        elif a.get("cert_images") and len(missing) >= 3:
+            issues.append({"type": "award", "index": i, "name": name, "missing": missing})
+    for i, t in enumerate(profile.get("talents") or []):
+        title = str(t.get("title") or "").strip()
+        if not title or title in GENERIC_NAMES:
+            issues.append({"type": "talent", "index": i, "title": title, "missing": ["title"]})
+    return issues
+
+
 def build_essay(profile: dict, student_dir: Path) -> str:
     """优先读 self_recommendation.md；缺失时用素材兜底拼接。"""
     md = student_dir / "self_recommendation.md"
@@ -171,6 +192,7 @@ def main():
 
     normalize(profile)
     missing = sanitize(profile, student_dir)
+    incomplete = find_incomplete(profile)
     downsample = downsample_images(student_dir)
     essay = build_essay(profile, student_dir)
     template_id = args.template or (profile.get("meta") or {}).get("template_id") or "classic-blue"
@@ -223,6 +245,7 @@ def main():
         "html": str(html_path),
         "height_px": height,
         "missing_images": missing,
+        "incomplete_entries": incomplete,
         "downsample": downsample,
     }, ensure_ascii=False))
 

@@ -73,9 +73,17 @@ python scripts/download.py
 
 ### 第 2 步：逐学生处理（对每个学生目录依次执行）
 
-**2a. 阅读材料**
+**2a. 阅读材料 + 附件核对补全（必须执行，不许跳）**
 
 读取 `{dir}/profile.json`（结构见下节），全面掌握学生情况。
+
+然后**逐张打开 `attachments/` 里的证书/奖状图片**，与 profile.json 的 awards / talents 逐条核对。收集页只是素材入口，家长录入和 OCR 都可能缺漏——**最终成品由本 Skill 负责，任何一张家长上传的证书都不许漏掉文字信息**：
+
+- **有条目但字段缺**：name 为空/笼统（「奖状」「荣誉证书」）、缺 level/rank/date/org 的，按证书原文补全。
+- **有图片但无对应条目**：attachments/ 里存在未被任何 awards/talents/works 条目引用的证书图片时，新建对应条目并按证书内容填齐字段。
+- **条目与证书不符**：以证书为准修正（颁奖单位、奖次、日期一律按证书原文誊写）。
+- **誊写规则**：只写证书上看得到的事实，看不清的字段留空并在汇报中标注，绝不臆造；奖项名用证书上的正式全称；cup_tier 按本 Skill 的城市知识判断。
+- 补全/修正完成后**保存 profile.json**，再进入 2b。render.py 会输出 `incomplete_entries` 提醒仍有缺漏的条目，渲染后自查必须确认其为空。
 
 **2b. 特点挖掘（先画像，再动笔）**
 
@@ -123,7 +131,7 @@ python scripts/render.py {dir}
 - 渲染前自动把 `attachments/` 里宽度 >1000px 的图片原地降采样（JPEG q85 / PNG optimize，保留 EXIF 方向标记），PDF 体积从几十 MB 降到 2~4MB；幂等，重跑不会重复压缩。原图仍在收集系统 R2 中，workspace 只是缓存。
 - 若 `self_recommendation.md` 不存在，脚本用 essay_material 素材自动拼接一版兜底自荐信（Agent 模式下应总是先完成 2b，此为保险）。
 - 单页连贯 PDF 的实现：视口固定 794px 宽渲染 HTML，测量全文高度后以 `page.pdf(width=210mm, height=计算高度)` 一次性输出，无任何分页。
-- **渲染后必须自查**：打开生成的 `resume.html` 确认图片路径全部有效、照片正常显示。脚本会在 stdout 输出 `{"ok": true, "pdf": "…/resume.pdf", "height_px": 4820, "missing_images": []}`；若 `missing_images` 非空，说明 profile.json 引用了未成功下载的附件（download.py 会在 `students[].missing_attachments` 列出 404 的附件），检查后重试。
+- **渲染后必须自查**：打开生成的 `resume.html` 确认图片路径全部有效、照片正常显示。脚本会在 stdout 输出 `{"ok": true, "pdf": "…/resume.pdf", "height_px": 4820, "missing_images": [], "incomplete_entries": []}`；若 `missing_images` 非空，说明 profile.json 引用了未成功下载的附件（download.py 会在 `students[].missing_attachments` 列出 404 的附件），检查后重试；若 `incomplete_entries` 非空，说明仍有「有图无字」的获奖/特长条目，回到 2a 打开证书图片补全后重渲。
 
 **2e. 上传回传**
 
@@ -163,7 +171,7 @@ python scripts/upload.py {dir}
 按「profile.json 结构速查」手工组装。要点：
 
 - **city 必须确定**：从材料推断（学校名、学制、提到的杯赛）或直接问用户。确定后按本 Skill「各城市小升初领域知识」填写 city 对象（code/name/schooling/core_semesters/essay_tips 照抄对应城市口径）。
-- **材料转结构化**：文字描述里的奖项逐条拆进 awards（名称用正式全称、判断 cup_tier）；成绩进 grades（标 is_core）；特长/作品同理。证书照片路径写进对应条目的 cert_images。
+- **材料转结构化**：文字描述里的奖项逐条拆进 awards（名称用正式全称、判断 cup_tier）；成绩进 grades（标 is_core）；特长/作品同理。证书照片路径写进对应条目的 cert_images。**凡是有证书图片的，必须逐张看图按原文誊写补全文字字段**（同批处理 2a 的附件核对规则），不允许「有图无字」。
 - **材料不清晰就问用户**，不要猜着写：奖项等级不明、学期成绩缺失、没有照片、城市不明、素材笼统（「孩子挺优秀的」）——这些都是必须提问的点。提问要具体（「华杯是一等还是二等？哪一年？」），一次问完，不要挤牙膏。
 - `meta` 填 `{ "batch_no": "direct", "material_version": 1, "template_id": "classic-blue" }`（用户指定模板则用指定的）。
 
