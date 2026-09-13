@@ -32,7 +32,7 @@
 ```
 老师创建学生 → 发链接 → 家长填写/上传/选模板(自动保存) → 家长提交
      ↓
-AI Skill: GET /api/ai/export  (拉取所有待导出学生 → zip)
+AI Skill: POST /api/ai/export/begin → GET profile/attachments 按学生拉取（v1.10 起，替代整批 zip）
      ↓
 AI Skill: 逐学生生成连贯单页 PDF
      ↓
@@ -598,9 +598,27 @@ interface CityConfig {
 
 ### 4.3 AI 端（X-API-Key 头）——Skill 调用的核心接口
 
-#### GET /api/ai/export
+#### v1.10 按学生拉取模式（Skill 默认路径）
+
+整批 zip 导出要求「所有学生附件 + zip 输出缓冲」同时驻留内存，批附件总量 ~60MB 即顶穿 Workers 128MB 上限（error 1102）。v1.10 起 Skill 改用按学生拉取，任何单次请求内存占用与附件总量无关：
+
+**① POST /api/ai/export/begin** —— 开启批次。快照待导出学生写入 export_batches + export_items（**不推进** exported_version），无待导出学生返回 `204`。响应：
+
+```json
+{ "ok": true, "data": { "batch_no": "B20260913-001", "exported_at": "…", "students": [ { "id": "S0007", "name": "张小明", "material_version": 4 } ] } }
+```
+
+**② GET /api/ai/students/:id/profile?batch_no=&exported_at=** —— 单学生 profile.json（KB 级）。响应 `data` 即 profile 契约（第 5 章），外加 `data.attachments`：profile 实际引用的附件清单 `[{ id, path, mime_type, size }]`（孤儿附件不下发；path 为学生目录内相对路径如 `attachments/a0001.jpg`）。
+
+**③ GET /api/ai/attachments/:id** —— 单张附件，R2 `obj.body` 流式转发（零内存放大）。`GET /api/ai/revision-files/:id` 同理转发退回修改佐证文件。
+
+**④ POST /api/ai/export/:id/ack** —— body `{ "batch_no": "…" }`，客户端确认该学生材料全部下载完成，服务端按 export_items 快照推进 `exported_version`、`status='exported'`。仅当 `students.material_version` 仍等于快照版本时生效，否则返回 `stale: true`（材料在导出期间被家长更新，本批次作废、下批重出）。下载失败的学生不 ack，自然留在待导出队列。
+
+#### GET /api/ai/export（整批 zip，保留为兜底）
 
 **语义**：拉取所有「待导出」学生（已提交且导出后材料有更新），打成一个 zip 返回，并记录导出批次。无待导出学生返回 `204 No Content`。
+
+> v1.10 起两处内存修复：① 只打包被 profile 引用的附件（`buildProfile` 回填 usedIds，孤儿附件跳过）；② zip 输出改流式（fflate `Zip` + `ZipPassThrough` 边压边吐），峰值内存 ≈ 源数据本身，不再随 zip 输出翻倍。
 
 **响应头**：`X-Batch-No: B20260906-001`、`Content-Disposition: attachment; filename="B20260906-001.zip"`。
 
@@ -623,7 +641,7 @@ S0012/
 1. 验 `X-API-Key`。
 2. 查待导出：`status='submitted' AND (exported_version IS NULL OR exported_version < material_version)`。
 3. 生成 batch_no（`B{YYYYMMDD}-{当日序号}`），插入 export_batches。
-4. 每个学生：按 `students.city` 取 CITY_CONFIGS，写入 `city` 对象（含 essay_tips）与每条 grade 的 `is_core`（按 core_semesters 计算）；组装 profile.json；读 attachments 的 R2 对象；`fflate.zipSync()` 打包（附件多时用 `level: 1` 换速度）。
+4. 每个学生：按 `students.city` 取 CITY_CONFIGS，写入 `city` 对象（含 essay_tips）与每条 grade 的 `is_core`（按 core_semesters 计算）；组装 profile.json（同时回填被引用附件 id 集合）；读被引用附件的 R2 对象；fflate 流式 `Zip` 打包。
 5. 事务内：插 export_items、更新 `students.exported_version = material_version`、`status='exported'`。
 6. 返回 zip。
 
@@ -640,11 +658,11 @@ for (const st of students) {
     files[`${st.id}/attachments/${att.id}.${ext(att)}`] = new Uint8Array(await obj.arrayBuffer());
   }
 }
-const zipped = zipSync(files, { level: 1 });
+const zipped = zipSync(files, { level: 1 });   // v1.10 起改为流式 buildZipStream(files)，见 src/lib/zip.ts
 return new Response(zipped, { headers: { "Content-Type": "application/zip", "X-Batch-No": batchNo, ... } });
 ```
 
-**限制与对策**：Workers 内存 128MB，单次导出建议 ≤ 50 名学生（前端/管理端可提示分批）。超过规模后升级方案见第 11 章。
+**限制与对策**：Workers 内存 128MB。v1.10 流式 zip 后峰值 ≈ 源附件总量（不再翻倍），单批附件 ~110MB 内安全；Skill 默认走按学生拉取模式，彻底与附件总量无关。
 
 #### POST /api/ai/resumes（multipart/form-data）
 

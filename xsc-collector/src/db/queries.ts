@@ -269,12 +269,14 @@ export async function buildMeResponse(
 /**
  * 组装导出用 profile.json（architecture.md 第 5 章契约）。
  * attachmentPath: (att) => zip 内相对路径，如 attachments/a0001.jpg
+ * usedIds: 传入时回填 profile 实际引用的附件 id（导出方据此跳过孤儿附件）
  */
 export async function buildProfile(
   db: D1Database,
   student: StudentRow,
   meta: { batch_no: string; exported_at: string },
-  attachmentPath: (att: AttachmentRow) => string
+  attachmentPath: (att: AttachmentRow) => string,
+  usedIds?: Set<string>
 ) {
   const [contacts, sectionRows, attachments] = await Promise.all([
     listContacts(db, student.id),
@@ -288,11 +290,15 @@ export async function buildProfile(
       ? ids
           .map((id) => attById.get(String(id)))
           .filter((a): a is AttachmentRow => !!a)
-          .map(attachmentPath)
+          .map((a) => {
+            usedIds?.add(a.id);
+            return attachmentPath(a);
+          })
       : [];
 
   const basic = parseJson<BasicInfo>(student.basic, {});
   const photoAtt = basic.photo ? attById.get(basic.photo) : undefined;
+  if (photoAtt) usedIds?.add(photoAtt.id);
 
   const grades: Record<string, unknown>[] = [];
   const awards: Record<string, unknown>[] = [];

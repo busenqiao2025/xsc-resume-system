@@ -106,6 +106,56 @@ def sanitize(profile: dict, student_dir: Path):
     return missing
 
 
+def downsample_images(student_dir: Path, max_width: int = 1000, quality: int = 85) -> dict:
+    """attachments/ 下图片原地降采样：宽度超过 max_width 才处理（幂等）。
+
+    模板证书显示区只有 168×118px，嵌入原图（手机拍摄可达 7.5MB/张）会把 PDF 顶到 30MB。
+    降采样后 PDF 通常 2~4MB。原地覆盖不丢数据——原图仍在收集系统 R2 中，workspace 只是缓存。
+    """
+    try:
+        from PIL import Image
+    except ImportError:
+        return {"processed": 0, "skipped": 0, "saved_bytes": 0, "note": "pillow 未安装，跳过降采样"}
+
+    stats = {"processed": 0, "skipped": 0, "saved_bytes": 0}
+    att_dir = student_dir / "attachments"
+    if not att_dir.is_dir():
+        return stats
+    for p in sorted(att_dir.iterdir()):
+        ext = p.suffix.lower()
+        if ext not in (".jpg", ".jpeg", ".png", ".webp"):
+            continue
+        try:
+            img = Image.open(p)
+            w, h = img.size
+        except Exception:
+            continue  # 非图片/损坏文件交给 sanitize 报 missing
+        if w <= max_width:
+            stats["skipped"] += 1
+            continue
+        exif_bytes = img.info.get("exif")  # 保留 EXIF 方向标记，模板 image-orientation 依赖它
+        fmt = img.format
+        img = img.resize((max_width, round(h * max_width / w)), Image.LANCZOS)
+        before = p.stat().st_size
+        try:
+            if fmt == "PNG":
+                img.save(p, "PNG", optimize=True)
+            elif fmt == "WEBP":
+                img.save(p, "WEBP", quality=quality)
+            else:
+                if img.mode != "RGB":
+                    img = img.convert("RGB")
+                kw = {"quality": quality, "optimize": True}
+                if exif_bytes:
+                    kw["exif"] = exif_bytes
+                img.save(p, "JPEG", **kw)
+        except Exception:
+            continue
+        stats["processed"] += 1
+        stats["saved_bytes"] += before - p.stat().st_size
+    return stats
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("student_dir", type=Path)
@@ -121,6 +171,7 @@ def main():
 
     normalize(profile)
     missing = sanitize(profile, student_dir)
+    downsample = downsample_images(student_dir)
     essay = build_essay(profile, student_dir)
     template_id = args.template or (profile.get("meta") or {}).get("template_id") or "classic-blue"
     tpl_dir = TEMPLATES_DIR / template_id
@@ -172,6 +223,7 @@ def main():
         "html": str(html_path),
         "height_px": height,
         "missing_images": missing,
+        "downsample": downsample,
     }, ensure_ascii=False))
 
 

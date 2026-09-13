@@ -3,7 +3,7 @@ import { Hono } from "hono";
 import type { Env, StudentRow } from "../types";
 import { aiAuth } from "../lib/auth";
 import { buildProfile, listPendingExport } from "../db/queries";
-import { buildZip, profileJsonBytes, zipAttachmentPath, type ExportFile } from "../lib/zip";
+import { buildZipStream, profileJsonBytes, zipAttachmentPath, type ExportFile } from "../lib/zip";
 import { rand4, uniqueId } from "../lib/ids";
 import { MAX_RESUME_SIZE } from "../lib/validate";
 
@@ -16,6 +16,50 @@ const fail = (c: any, status: number, code: string, message: string) =>
   c.json({ ok: false, error: { code, message } }, status);
 
 const EXPORT_LIMIT = 50; // Workers 内存 128MB，单次导出建议 ≤ 50 名学生
+
+interface RevisionFileRow {
+  id: string;
+  r2_key: string;
+  original_name: string;
+  mime_type: string;
+}
+
+const safeFileName = (name: string) => name.replace(/[\\/:*?"<>|]/g, "_").slice(-60);
+const relRevisionPath = (f: { id: string; original_name: string }) =>
+  `revision/${f.id}-${safeFileName(f.original_name)}`;
+
+/** 批次号：B{YYYYMMDD}-{当日序号}（按北京时间日期） */
+async function nextBatchNo(db: D1Database, now: Date): Promise<string> {
+  const bjDate = new Date(now.getTime() + 8 * 3600 * 1000).toISOString().slice(0, 10).replace(/-/g, "");
+  const prefix = `B${bjDate}-`;
+  const cnt = await db
+    .prepare("SELECT COUNT(*) AS n FROM export_batches WHERE batch_no LIKE ?")
+    .bind(`${prefix}%`)
+    .first<{ n: number }>();
+  return `${prefix}${String((cnt?.n ?? 0) + 1).padStart(3, "0")}`;
+}
+
+/** 退回修改上下文（v6）：该学生最新一条带修改意见的驳回简历 + 佐证文件清单 */
+async function loadRevisionContext(db: D1Database, studentId: string) {
+  const rejected = await db
+    .prepare(
+      "SELECT id, revision_note, essay_text FROM resumes WHERE student_id = ? AND revision_note IS NOT NULL AND revision_note != '' ORDER BY created_at DESC LIMIT 1"
+    )
+    .bind(studentId)
+    .first<{ id: string; revision_note: string; essay_text: string | null }>();
+  if (!rejected) return null;
+  const rfiles = await db
+    .prepare(
+      "SELECT id, r2_key, original_name, mime_type FROM revision_files WHERE resume_id = ? ORDER BY created_at ASC"
+    )
+    .bind(rejected.id)
+    .all<RevisionFileRow>();
+  return {
+    note: rejected.revision_note,
+    previous_essay: rejected.essay_text || "",
+    files: rfiles.results,
+  };
+}
 
 // GET /api/ai/pending — 探测用：待导出学生数量与列表摘要
 app.get("/pending", async (c) => {
@@ -30,57 +74,202 @@ app.get("/pending", async (c) => {
   });
 });
 
-// GET /api/ai/export — 拉取所有待导出学生，打成 zip 返回并记录批次
+// POST /api/ai/export/begin — 按学生拉取模式（v1.10）：开启批次
+// 快照待导出学生进 export_items，但不推进 exported_version（等客户端逐学生 ack）。
+// 客户端随后 GET profile + 逐个下载附件，全部成功后 POST /export/:id/ack。
+app.post("/export/begin", async (c) => {
+  const students = await listPendingExport(c.env.DB, EXPORT_LIMIT);
+  if (students.length === 0) return new Response(null, { status: 204 });
+
+  const now = new Date();
+  const exportedAt = now.toISOString();
+  const batchNo = await nextBatchNo(c.env.DB, now);
+
+  const stmts: D1PreparedStatement[] = [
+    c.env.DB.prepare(
+      "INSERT INTO export_batches (batch_no, student_count, created_at) VALUES (?,?,?)"
+    ).bind(batchNo, students.length, exportedAt),
+  ];
+  for (const s of students) {
+    stmts.push(
+      c.env.DB.prepare(
+        "INSERT INTO export_items (batch_no, student_id, material_version) VALUES (?,?,?)"
+      ).bind(batchNo, s.id, s.material_version)
+    );
+  }
+  await c.env.DB.batch(stmts);
+
+  return ok(c, {
+    batch_no: batchNo,
+    exported_at: exportedAt,
+    students: students.map((s) => ({
+      id: s.id,
+      name: s.name,
+      material_version: s.material_version,
+    })),
+  });
+});
+
+// GET /api/ai/students/:id/profile — 单学生 profile.json（KB 级，无内存放大）
+// query: batch_no / exported_at（begin 返回值，缺省为 manual/now）
+// 响应 data.attachments：profile 实际引用的附件清单（id + 相对路径），客户端按 id 逐个下载
+app.get("/students/:id/profile", async (c) => {
+  const student = await c.env.DB.prepare("SELECT * FROM students WHERE id = ?")
+    .bind(c.req.param("id"))
+    .first<StudentRow>();
+  if (!student) return fail(c, 404, "NOT_FOUND", "学生不存在");
+
+  const batchNo = c.req.query("batch_no") || "manual";
+  const exportedAt = c.req.query("exported_at") || new Date().toISOString();
+  const usedIds = new Set<string>();
+  const profile = (await buildProfile(
+    c.env.DB,
+    student,
+    { batch_no: batchNo, exported_at: exportedAt },
+    zipAttachmentPath,
+    usedIds
+  )) as Record<string, unknown>;
+
+  const rev = await loadRevisionContext(c.env.DB, student.id);
+  if (rev) {
+    profile.revision = {
+      note: rev.note,
+      previous_essay: rev.previous_essay,
+      files: rev.files.map((f) => ({
+        id: f.id,
+        path: relRevisionPath(f),
+        name: f.original_name,
+        mime_type: f.mime_type,
+      })),
+    };
+  }
+
+  const atts = await c.env.DB.prepare(
+    "SELECT id, mime_type, original_name, size FROM attachments WHERE student_id = ?"
+  )
+    .bind(student.id)
+    .all<{ id: string; mime_type: string; original_name: string; size: number }>();
+  const referenced = atts.results
+    .filter((a) => usedIds.has(a.id))
+    .map((a) => ({
+      id: a.id,
+      path: zipAttachmentPath(a as any),
+      mime_type: a.mime_type,
+      size: a.size,
+    }));
+
+  return ok(c, { ...profile, attachments: referenced });
+});
+
+// GET /api/ai/attachments/:id — 单张附件，R2 流式转发（零内存放大、可断点续传）
+app.get("/attachments/:id", async (c) => {
+  const att = await c.env.DB.prepare(
+    "SELECT id, r2_key, mime_type, original_name FROM attachments WHERE id = ?"
+  )
+    .bind(c.req.param("id"))
+    .first<{ id: string; r2_key: string; mime_type: string; original_name: string }>();
+  if (!att) return fail(c, 404, "NOT_FOUND", "附件不存在");
+  const obj = await c.env.BUCKET.get(att.r2_key);
+  if (!obj) return fail(c, 404, "NOT_FOUND", "附件文件已丢失");
+
+  return new Response(obj.body, {
+    headers: {
+      "Content-Type": att.mime_type || obj.httpMetadata?.contentType || "application/octet-stream",
+      "Content-Length": String(obj.size),
+      "Cache-Control": "private, max-age=3600",
+      "Content-Disposition": `inline; filename*=UTF-8''${encodeURIComponent(att.original_name)}`,
+    },
+  });
+});
+
+// GET /api/ai/revision-files/:id — 退回修改佐证文件，R2 流式转发
+app.get("/revision-files/:id", async (c) => {
+  const rf = await c.env.DB.prepare(
+    "SELECT id, r2_key, mime_type, original_name FROM revision_files WHERE id = ?"
+  )
+    .bind(c.req.param("id"))
+    .first<{ id: string; r2_key: string; mime_type: string; original_name: string }>();
+  if (!rf) return fail(c, 404, "NOT_FOUND", "佐证文件不存在");
+  const obj = await c.env.BUCKET.get(rf.r2_key);
+  if (!obj) return fail(c, 404, "NOT_FOUND", "佐证文件已丢失");
+
+  return new Response(obj.body, {
+    headers: {
+      "Content-Type": rf.mime_type || obj.httpMetadata?.contentType || "application/octet-stream",
+      "Content-Length": String(obj.size),
+      "Cache-Control": "private, max-age=3600",
+      "Content-Disposition": `inline; filename*=UTF-8''${encodeURIComponent(rf.original_name)}`,
+    },
+  });
+});
+
+// POST /api/ai/export/:id/ack — 客户端确认该学生材料已下载完成，推进 exported_version
+// body: { batch_no }。仅当材料版本仍等于批次快照时推进（期间家长又改了材料则跳过，下批重新导出）
+app.post("/export/:id/ack", async (c) => {
+  const studentId = c.req.param("id");
+  const body = (await c.req.json<{ batch_no?: string }>().catch(() => ({}))) as {
+    batch_no?: string;
+  };
+  const batchNo = String(body.batch_no || "");
+  if (!batchNo) return fail(c, 400, "VALIDATION", "缺少 batch_no");
+
+  const item = await c.env.DB.prepare(
+    "SELECT material_version FROM export_items WHERE batch_no = ? AND student_id = ?"
+  )
+    .bind(batchNo, studentId)
+    .first<{ material_version: number }>();
+  if (!item) return fail(c, 404, "NOT_FOUND", `批次 ${batchNo} 中不存在学生 ${studentId}`);
+
+  const now = new Date().toISOString();
+  const res = await c.env.DB.prepare(
+    "UPDATE students SET exported_version = ?, status = 'exported', updated_at = ? WHERE id = ? AND material_version = ?"
+  )
+    .bind(item.material_version, now, studentId, item.material_version)
+    .run();
+
+  return ok(c, {
+    student_id: studentId,
+    exported_version: item.material_version,
+    stale: !res.meta.changes, // true = 材料在导出期间被家长更新，本批次作废、下批重出
+  });
+});
+
+// GET /api/ai/export — 一次性 zip 导出（整批打包，记录批次并直接推进 exported_version）
+// v1.10 起 Skill 默认走 begin/profile/attachments/ack 按学生拉取；本接口保留为整批兜底。
 app.get("/export", async (c) => {
   const students = await listPendingExport(c.env.DB, EXPORT_LIMIT);
   if (students.length === 0) return new Response(null, { status: 204 });
 
   const now = new Date();
   const exportedAt = now.toISOString();
-  // 批次号：B{YYYYMMDD}-{当日序号}（按北京时间日期）
-  const bjDate = new Date(now.getTime() + 8 * 3600 * 1000).toISOString().slice(0, 10).replace(/-/g, "");
-  const prefix = `B${bjDate}-`;
-  const cnt = await c.env.DB.prepare(
-    "SELECT COUNT(*) AS n FROM export_batches WHERE batch_no LIKE ?"
-  )
-    .bind(`${prefix}%`)
-    .first<{ n: number }>();
-  const batchNo = `${prefix}${String((cnt?.n ?? 0) + 1).padStart(3, "0")}`;
+  const batchNo = await nextBatchNo(c.env.DB, now);
 
   // 组装 zip：{student_id}/profile.json + {student_id}/attachments/{attachment_id}.{ext}
   const files: ExportFile[] = [];
   for (const student of students) {
-    const profile = await buildProfile(
+    const usedIds = new Set<string>();
+    const profile = (await buildProfile(
       c.env.DB,
       student,
       { batch_no: batchNo, exported_at: exportedAt },
-      zipAttachmentPath
-    ) as Record<string, unknown>;
+      zipAttachmentPath,
+      usedIds
+    )) as Record<string, unknown>;
 
-    // 退回修改上下文（v6）：取该学生最新一条带修改意见的驳回简历，
-    // 把修改意见、上一版自荐信、佐证文件一并交给 AI，在原有简历基础上修订
-    const rejected = await c.env.DB.prepare(
-      "SELECT id, revision_note, essay_text FROM resumes WHERE student_id = ? AND revision_note IS NOT NULL AND revision_note != '' ORDER BY created_at DESC LIMIT 1"
-    )
-      .bind(student.id)
-      .first<{ id: string; revision_note: string; essay_text: string | null }>();
-    if (rejected) {
-      const rfiles = await c.env.DB.prepare(
-        "SELECT id, r2_key, original_name, mime_type FROM revision_files WHERE resume_id = ? ORDER BY created_at ASC"
-      )
-        .bind(rejected.id)
-        .all<{ id: string; r2_key: string; original_name: string; mime_type: string }>();
-      const revFiles: { path: string; name: string; mime_type: string }[] = [];
-      for (const rf of rfiles.results) {
+    // 退回修改上下文（v6）：修改意见、上一版自荐信、佐证文件一并打包
+    const rev = await loadRevisionContext(c.env.DB, student.id);
+    if (rev) {
+      const revFiles: { id: string; path: string; name: string; mime_type: string }[] = [];
+      for (const rf of rev.files) {
         const obj = await c.env.BUCKET.get(rf.r2_key);
         if (!obj) continue;
-        const zipPath = `${student.id}/revision/${rf.id}-${rf.original_name.replace(/[\\/:*?"<>|]/g, "_").slice(-60)}`;
-        files.push({ path: zipPath, data: new Uint8Array(await obj.arrayBuffer()) });
-        revFiles.push({ path: zipPath.replace(`${student.id}/`, ""), name: rf.original_name, mime_type: rf.mime_type });
+        const rel = relRevisionPath(rf);
+        files.push({ path: `${student.id}/${rel}`, data: new Uint8Array(await obj.arrayBuffer()) });
+        revFiles.push({ id: rf.id, path: rel, name: rf.original_name, mime_type: rf.mime_type });
       }
       profile.revision = {
-        note: rejected.revision_note,
-        previous_essay: rejected.essay_text || "",
+        note: rev.note,
+        previous_essay: rev.previous_essay,
         files: revFiles,
       };
     }
@@ -93,6 +282,7 @@ app.get("/export", async (c) => {
       .bind(student.id)
       .all<{ id: string; r2_key: string; mime_type: string; original_name: string }>();
     for (const att of atts.results) {
+      if (!usedIds.has(att.id)) continue; // 只打包被 profile 引用的附件（孤儿附件是 1102 内存超限主因）
       const obj = await c.env.BUCKET.get(att.r2_key);
       if (!obj) continue; // R2 对象缺失时跳过，不阻断整个批次
       files.push({
@@ -101,7 +291,6 @@ app.get("/export", async (c) => {
       });
     }
   }
-  const zipped = buildZip(files);
 
   // 事务：批次记录 + export_items + exported_version / status 更新（architecture.md 8.5）
   const stmts: D1PreparedStatement[] = [
@@ -123,7 +312,8 @@ app.get("/export", async (c) => {
   }
   await c.env.DB.batch(stmts);
 
-  return new Response(zipped as unknown as BodyInit, {
+  // 流式 zip：不生成整份输出缓冲，避免 Workers 128MB 内存上限（error 1102）
+  return new Response(buildZipStream(files) as unknown as BodyInit, {
     headers: {
       "Content-Type": "application/zip",
       "X-Batch-No": batchNo,

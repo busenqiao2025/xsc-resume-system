@@ -1,6 +1,6 @@
 ---
 name: xiaoshengchu-resume-generator
-description: 小升初简历批量生成工作流。当需要为已收集材料的学生生成小升初简历 PDF 时使用。自动从收集系统 API 下载待生成学生的材料 zip 包，逐学生撰写自荐信并用 HTML 模板渲染成单页连贯长卷 PDF（不是分页 PDF），最后自动上传回收集系统。触发词：生成小升初简历、批量生成简历、生成简历、处理待生成学生。
+description: 小升初简历批量生成工作流。当需要为已收集材料的学生生成小升初简历 PDF 时使用。自动从收集系统 API 按学生拉取待生成材料（profile + 附件），逐学生撰写自荐信并用 HTML 模板渲染成单页连贯长卷 PDF（不是分页 PDF），最后自动上传回收集系统。触发词：生成小升初简历、批量生成简历、生成简历、处理待生成学生。
 ---
 
 # 小升初简历生成 Skill
@@ -65,10 +65,11 @@ macOS 自带 PingFang SC，无需处理。
 python scripts/download.py
 ```
 
-- 脚本会调用 `GET {api_base}/api/ai/export`，把所有待导出学生打成一个 zip 下载并解压到 `workspace/{batch_no}/`。
-- **stdout 输出一行 JSON**：`{"batch_no": "B20260906-001", "count": 3, "students": [{"student_id": "S0007", "name": "张小明", "dir": "workspace/B20260906-001/S0007"}], "empty": false}`
+- 脚本走「按学生拉取」流程（v1.10 起，替代旧的整批 zip 导出）：`POST /api/ai/export/begin` 开启批次 → 逐学生 `GET /api/ai/students/{id}/profile` → 逐个下载被引用附件（`GET /api/ai/attachments/{id}`，R2 流式转发，不受 Workers 内存限制）→ 全部成功后 `POST /api/ai/export/{id}/ack` 确认，服务端才推进该学生的导出版本。材料保存到 `workspace/{batch_no}/{student_id}/`。
+- **stdout 输出一行 JSON**：`{"batch_no": "B20260906-001", "count": 3, "students": [{"student_id": "S0007", "name": "张小明", "dir": "workspace/B20260906-001/S0007"}], "failed": [], "empty": false}`
 - 若 `"empty": true` 表示当前没有待生成学生，直接结束并汇报「无待生成学生」。
-- 已导出过的学生不会重复出现在 zip 中（服务端按材料版本去重），下载天然幂等。
+- 已导出的学生不会重复出现（服务端按材料版本去重）。下载失败的学生进入 `failed` 列表且**不会 ack**，留在待导出队列下批重试；`students[].missing_attachments` 列出 404 的丢失附件（不阻断，渲染阶段会自动剔除）。
+- `students[].stale: true` 表示导出期间家长又改了材料——该学生本次生成的简历基于旧快照，下个批次会自动重出，属正常现象。
 
 ### 第 2 步：逐学生处理（对每个学生目录依次执行）
 
@@ -107,7 +108,7 @@ python scripts/download.py
 
 - `revision.note`：工作人员的修改意见。**逐条对照落实**，每条意见都要在修订结果里有回应（改了什么，或为什么材料不支持改）。
 - `revision.previous_essay`：上一版自荐信原文。以它为底稿修订——意见没点名的问题（结构、口吻、事实）保持原有水平，不要顺手推翻重写。
-- `revision.files`：佐证文件（zip 内 `revision/` 目录下，图片/PDF）。逐个打开看，里面可能有新证书、成绩单截图、参考样例——把其中的新事实吸收进材料和自荐信（新奖项补进 profile.json 的 awards 并保存）。
+- `revision.files`：佐证文件（学生目录下 `revision/` 子目录，图片/PDF）。逐个打开看，里面可能有新证书、成绩单截图、参考样例——把其中的新事实吸收进材料和自荐信（新奖项补进 profile.json 的 awards 并保存）。
 - 家长端材料若同时有更新（材料版本推进），新旧变化一并融合：以最新 profile.json 为准，修改意见作为质量要求叠加。
 - 修订后的自荐信同样写入 `{dir}/self_recommendation.md` 覆盖旧稿，traits.md 同步更新。
 
@@ -119,9 +120,10 @@ python scripts/render.py {dir}
 ```
 
 - 脚本用 Jinja2 渲染 `templates/{模板}/template.html`，输出 `{dir}/resume.html` 与 `{dir}/resume.pdf`。
+- 渲染前自动把 `attachments/` 里宽度 >1000px 的图片原地降采样（JPEG q85 / PNG optimize，保留 EXIF 方向标记），PDF 体积从几十 MB 降到 2~4MB；幂等，重跑不会重复压缩。原图仍在收集系统 R2 中，workspace 只是缓存。
 - 若 `self_recommendation.md` 不存在，脚本用 essay_material 素材自动拼接一版兜底自荐信（Agent 模式下应总是先完成 2b，此为保险）。
 - 单页连贯 PDF 的实现：视口固定 794px 宽渲染 HTML，测量全文高度后以 `page.pdf(width=210mm, height=计算高度)` 一次性输出，无任何分页。
-- **渲染后必须自查**：打开生成的 `resume.html` 确认图片路径全部有效、照片正常显示。脚本会在 stdout 输出 `{"ok": true, "pdf": "…/resume.pdf", "height_px": 4820, "missing_images": []}`；若 `missing_images` 非空，说明 profile.json 引用了 zip 里不存在的附件，检查后重试。
+- **渲染后必须自查**：打开生成的 `resume.html` 确认图片路径全部有效、照片正常显示。脚本会在 stdout 输出 `{"ok": true, "pdf": "…/resume.pdf", "height_px": 4820, "missing_images": []}`；若 `missing_images` 非空，说明 profile.json 引用了未成功下载的附件（download.py 会在 `students[].missing_attachments` 列出 404 的附件），检查后重试。
 
 **2e. 上传回传**
 
@@ -195,7 +197,7 @@ revision: { note, previous_essay, files[] }  # 可选。退回修改时由服务
 meta: { batch_no, material_version, exported_at, template_id }
 ```
 
-`photo`、`cert_images`、`images` 的值均为 zip 内相对路径（如 `attachments/a0001.jpg`），HTML 模板直接 `<img src>` 引用。
+`photo`、`cert_images`、`images` 的值均为学生目录内相对路径（如 `attachments/a0001.jpg`），HTML 模板直接 `<img src>` 引用。
 
 `meta.material_version` 是**家长点击「提交材料」确认的快照版本**（v1.3 起材料写操作不再推进版本，只有提交才推进）；服务端导出按 `exported_version < material_version` 去重的逻辑不变。
 
